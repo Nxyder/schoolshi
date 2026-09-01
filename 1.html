@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic UBG</title>
+    
+    <!-- Nex Game Platform Script -->
+    <script src="https://cdn.jsdelivr.net/gh/UseNex/nex-js@f60df53fb5554e4e160c086b47bf71f6a213e42c/nex.min.js"></script>
+    
+    <style>
+        /* Klassieke, simpele styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Simpele header */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #dddddd;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #222;
+        }
+
+        .search-bar {
+            padding: 8px 12px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* Container voor de spellen */
+        #main-view {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        /* Klassieke 'witte kaart' stijl */
+        .card {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: #999;
+            background-color: #fafafa;
+        }
+
+        .card img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .card h3 {
+            font-size: 14px;
+            margin: 10px 0 5px 0;
+            color: #0056b3; /* Klassieke link-kleur */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card p {
+            font-size: 12px;
+            color: #666;
+            margin: 0;
+        }
+
+        /* Spel Weergave */
+        #player-view {
+            display: none;
+            flex: 1;
+            background: #000000;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .btn-back {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 10;
+            background: #f4f4f4;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-back:hover {
+            background: #e4e4e4;
+        }
+
+        /* Simpele Laadbalk in het spel */
+        #loading-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #111;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            color: white;
+        }
+
+        .progress-track {
+            width: 300px;
+            height: 20px;
+            background: #333;
+            border: 1px solid #555;
+            margin-top: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #4CAF50; /* Standaard groen voor laden */
+            transition: width 0.1s linear;
+        }
+
+        /* Perfect Alignment voor de Game */
+        #game-container-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        nex-game {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border: none;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Classic UBG</h1>
+        <input type="text" id="search" class="search-bar" placeholder="Zoeken..." oninput="handleSearch(this.value)">
+    </header>
+
+    <div id="main-view">
+        <div class="container">
+            <div class="grid" id="gallery">
+                <!-- Spellen komen hier -->
+            </div>
+        </div>
+    </div>
+
+    <div id="player-view">
+        <button class="btn-back" onclick="closeGame()">← Terug</button>
+        
+        <div id="loading-overlay">
+            <h2 id="loading-title">Laden...</h2>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-bar"></div>
+            </div>
+            <div style="margin-top: 10px;" id="progress-text">0%</div>
+        </div>
+
+        <div id="game-container-wrapper"></div>
+    </div>
+
+    <script>
+        let allGames = {};
+        let currentGameId = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if(window.nex && window.nex.metadata) {
+                    allGames = window.nex.metadata.getAllMetadata();
+                    renderGallery(Object.values(allGames));
+                } else {
+                    document.getElementById('gallery').innerHTML = '<p class="no-results">Systeem kon niet laden.</p>';
+                }
+            }, 100);
+        });
+
+        function handleSearch(query) {
+            const q = query.toLowerCase();
+            const filtered = Object.values(allGames).filter(game => 
+                game.name.toLowerCase().includes(q) || 
+                game.category.toLowerCase().includes(q)
+            );
+            renderGallery(filtered);
+        }
+
+        function renderGallery(gamesArray) {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            
+            if (gamesArray.length === 0) {
+                gallery.innerHTML = '<p class="no-results">Geen resultaten gevonden.</p>';
+                return;
+            }
+
+            gamesArray.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => playGame(game.alias, game.name);
+                card.innerHTML = `
+                    <img src="${game.img}" alt="${game.name}" loading="lazy">
+                    <h3>${game.name}</h3>
+                    <p>${game.category}</p>
+                `;
+                gallery.appendChild(card);
+            });
+        }
+
+        function playGame(alias, gameName) {
+            document.getElementById('main-view').style.display = 'none';
+            document.getElementById('search').style.display = 'none';
+            document.getElementById('player-view').style.display = 'flex';
+            
+            document.getElementById('loading-overlay').style.display = 'flex';
+            document.getElementById('loading-title').innerText = `${gameName} wordt geladen...`;
+            updateProgress(0);
+
+            const wrapper = document.getElementById('game-container-wrapper');
+            currentGameId = `game-${Date.now()}`; // Simpele unieke ID
+
+            const gameElement = document.createElement('nex-game');
+            gameElement.setAttribute('alias', alias);
+            gameElement.setAttribute('gid', currentGameId);
+            wrapper.appendChild(gameElement);
+
+            setTimeout(() => {
+                if(window.nex[currentGameId]) {
+                    window.nex[currentGameId].on('progress', (data) => updateProgress(Math.min(Math.round(data.progress), 100)));
+                    
+                    window.nex[currentGameId].on('ready', () => {
+                        updateProgress(100);
+                        setTimeout(() => {
+                            document.getElementById('loading-overlay').style.display = 'none';
+                            window.nex[currentGameId].start();
+                        }, 300);
+                    });
+                    
+                    window.nex[currentGameId].on('error', (err) => {
+                        document.getElementById('loading-title').innerText = "Fout bij laden.";
+                    });
+                }
+            }, 50);
+        }
+
+        function updateProgress(pct) {
+            document.getElementById('progress-bar').style.width = pct + '%';
+            document.getElementById('progress-text').innerText = pct + '%';
+        }
+
+        function closeGame() {
+            document.getElementById('game-container-wrapper').innerHTML = '';
+            currentGameId = null;
+            document.getElementById('player-view').style.display = 'none';
+            document.getElementById('main-view').style.display = 'block';
+            document.getElementById('search').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
