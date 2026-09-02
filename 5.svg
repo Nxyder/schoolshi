@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="300" viewBox="0 0 500 300">
+  <style>
+    .bg { fill: #f8fafc; }
+    .card { fill: #ffffff; filter: drop-shadow(0px 4px 12px rgba(0,0,0,0.08)); rx: 12px; }
+    .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 18px; font-weight: bold; fill: #1e293b; }
+    .text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; fill: #64748b; }
+  </style>
+
+  <!-- Achtergrond -->
+  <rect width="500" height="300" class="bg"/>
+  <rect x="40" y="30" width="420" height="240" class="card" rx="12" ry="12"/>
+
+  <!-- Titel en beschrijving -->
+  <text x="70" y="80" class="title">Open HTML in about:blank</text>
+  <text x="70" y="105" class="text">Klik op de knop om een nieuw tabblad te openen met eigen HTML.</text>
+
+  <!-- HTML Interactie via foreignObject voor de knop -->
+  <foreignObject x="70" y="140" width="360" height="80">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: sans-serif; text-align: center;">
+      <button onclick="openAboutBlank()" style="background-color: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%;">
+        Open Nieuw Tabblad
+      </button>
+    </div>
+  </foreignObject>
+
+  <!-- JavaScript logica -->
+  <script type="text/javascript">
+    <![CDATA[
+      function openAboutBlank() {
+        // Open een nieuw leeg tabblad
+        const newTab = window.open('about:blank', '_blank');
+        
+        if (newTab) {
+          // Schrijf HTML direct naar het nieuwe tabblad
+          newTab.document.write(`
+            <!DOCTYPE html>
+            <html lang="nl">
+            <head>
+                <meta charset="UTF-8">
+                <title>Nieuwe Pagina vanuit SVG</title>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; background-color: #f0fdf4; color: #166534; }
+                    h1 { font-size: 28px; }
+                </style>
+            </head>
+            <body>
+                <h1>Hallo vanuit about:blank!</h1>
+                <p>Deze pagina is dynamisch gegenereerd via JavaScript vanuit een SVG-bestand.</p>
+            </body>
+            </html>
+          `);
+          // Sluit de document stream zodat de browser weet dat het laden klaar is
+          newTab.document.close();
+        } else {
+          alert('Pop-up blocker houdt het openen van het tabblad tegen.');
+        }
+      }
+    ]]>
+  </script>
+</svg>
