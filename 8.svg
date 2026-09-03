@@ -1,8 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="500" height="300" viewBox="0 0 500 300" preserveAspectRatio="xMidYMid meet" style="display:block; margin:0 auto; background:#000000; max-width:100%; height:auto;">
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="300" viewBox="0 0 500 300" preserveAspectRatio="xMidYMid meet" style="display:block; width:500px; height:300px; background:#000000; border-radius:12px; overflow:hidden;">
   <style>
     .bg { fill: #000000; }
     .card { fill: #1a1a1a; rx: 16px; }
-    .text { font-family: 'Lexend', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 300; font-size: 14px; fill: #ffffff; letter-spacing: 0.5px; }
+    .text { font-family: 'Lexend', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 300; font-size: 14px; fill: #ffffff; letter-spacing: 0.5px; cursor: pointer; user-select: none; }
+    .clickable { cursor: pointer; }
   </style>
 
   <!-- Pure black background + card -->
@@ -10,10 +11,10 @@
   <rect x="40" y="30" width="420" height="240" class="card" rx="16" ry="16"/>
 
   <!-- Click overlay - entire card is clickable -->
-  <rect x="40" y="30" width="420" height="240" rx="16" ry="16" fill="transparent" cursor="pointer" onclick="openBase64Tab()"/>
+  <rect x="40" y="30" width="420" height="240" rx="16" ry="16" fill="transparent" class="clickable" onclick="openBase64Tab()"/>
 
   <!-- Small text in center -->
-  <text x="250" y="160" class="text" text-anchor="middle" dominant-baseline="middle">Open</text>
+  <text x="250" y="160" class="text" text-anchor="middle" dominant-baseline="middle" onclick="openBase64Tab()">Open</text>
 
   <!-- JavaScript with empty Base64 var -->
   <script type="text/javascript">
