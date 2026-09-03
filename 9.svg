@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="300" viewBox="0 0 500 300" preserveAspectRatio="xMidYMid meet" style="display:block; width:100%; height:100%;">
+    <style>
+        .card { fill: rgba(255, 255, 255, 0.06); backdrop-filter: blur(12px); rx: 16px; stroke: rgba(255, 255, 255, 0.08); stroke-width: 1px; }
+        .text { font-family: 'Lexend', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 300; font-size: 14px; fill: rgba(255, 255, 255, 0.9); letter-spacing: 0.5px; cursor: pointer; user-select: none; }
+        .clickable { cursor: pointer; }
+    </style>
+
+    <!-- Transparant met glassmorphism effect -->
+    <rect x="40" y="30" width="420" height="240" class="card" rx="16" ry="16"/>
+
+    <!-- Click overlay - entire card is clickable -->
+    <rect x="40" y="30" width="420" height="240" rx="16" ry="16" fill="transparent" class="clickable" onclick="openBase64Tab()"/>
+
+    <!-- Small text in center -->
+    <text x="250" y="160" class="text" text-anchor="middle" dominant-baseline="middle" onclick="openBase64Tab()">Open</text>
+
+    <!-- JavaScript with empty Base64 var -->
+    <script type="text/javascript">
+        <![CDATA[
+            function openBase64Tab() {
+                const htmlBase64 = "";
+
+                if (!htmlBase64) {
+                    alert("The Base64 variable is still empty – waiting for content.");
+                    return;
+                }
+
+                const newTab = window.open('about:blank', '_blank');
+                if (newTab) {
+                    const decodedHtml = decodeURIComponent(escape(atob(htmlBase64)));
+                    newTab.document.write(decodedHtml);
+                    newTab.document.close();
+                } else {
+                    alert('Pop-up blocker is preventing the tab from opening.');
+                }
+            }
+        ]]>
+    </script>
+</svg>
