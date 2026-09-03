@@ -1,0 +1,405 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     id="mainSvg"
+     width="100%" height="100%"
+     viewBox="0 0 1920 1080"
+     preserveAspectRatio="xMidYMid meet"
+     style="display:block; margin:0 auto; background:#0a0a0f; position:fixed; top:0; left:0; width:100vw; height:100vh;">
+
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&amp;display=swap');
+
+      * { margin:0; padding:0; box-sizing:border-box; }
+
+      .title {
+        font-family: 'Inter', sans-serif;
+        font-size: 48px;
+        font-weight: 700;
+        fill: #ffffff;
+        letter-spacing: -1px;
+      }
+
+      .subtitle {
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        font-weight: 300;
+        fill: #8888aa;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+      }
+
+      .loading-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 18px;
+        font-weight: 300;
+        fill: #8888aa;
+        animation: pulseText 1.5s infinite ease-in-out;
+      }
+
+      @keyframes pulseText {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 1; }
+      }
+
+      .game-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .game-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .game-card rect {
+        fill: #1a1a2e;
+        rx: 12px;
+        transition: fill 0.3s ease;
+      }
+
+      .game-card:hover rect {
+        fill: #252545;
+      }
+
+      .game-name {
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        fill: #ffffff;
+      }
+
+      .game-category {
+        font-family: 'Inter', sans-serif;
+        font-size: 10px;
+        font-weight: 300;
+        fill: #8888aa;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .back-btn {
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        fill: #ffffff;
+        cursor: pointer;
+      }
+
+      .back-btn rect {
+        fill: rgba(255,255,255,0.1);
+        rx: 8px;
+        stroke: rgba(255,255,255,0.2);
+        stroke-width: 1;
+        transition: all 0.3s ease;
+      }
+
+      .back-btn:hover rect {
+        fill: rgba(255,255,255,0.2);
+        stroke: rgba(255,255,255,0.4);
+      }
+
+      #gameContainer {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 9999;
+        background: #0a0a0f;
+      }
+
+      #gameContainer.active {
+        display: block;
+      }
+
+      #gameFrame {
+        width: 100vw;
+        height: 100vh;
+        border: none;
+        background: #0a0a0f;
+      }
+    </style>
+  </defs>
+
+  <!-- Achtergrond -->
+  <rect width="1920" height="1080" fill="#0a0a0f" />
+
+  <!-- Header -->
+  <text x="960" y="70" text-anchor="middle" class="title">Nex Games</text>
+  <text x="960" y="108" text-anchor="middle" class="subtitle">Click any game to play</text>
+
+  <!-- Loading indicator -->
+  <g id="loadingIndicator">
+    <text x="960" y="560" text-anchor="middle" class="loading-text">Loading games...</text>
+  </g>
+
+  <!-- Error indicator -->
+  <g id="errorIndicator" style="display:none;">
+    <text x="960" y="520" text-anchor="middle" class="loading-text" fill="#ef4444">Failed to load games</text>
+    <g onclick="loadGames()" style="cursor:pointer;">
+      <rect x="880" y="550" width="160" height="40" rx="8" fill="#1a1a2e" stroke="#333" stroke-width="1" />
+      <text x="960" y="576" text-anchor="middle" class="game-name" fill="#ffffff">Retry</text>
+    </g>
+  </g>
+
+  <!-- Game Grid -->
+  <g id="gameGrid" style="display:none;"></g>
+
+  <!-- GAME CONTAINER (iframe) -->
+  <foreignObject id="gameContainer" x="0" y="0" width="1920" height="1080">
+    <xhtml:div xmlns="http://www.w3.org/1999/xhtml"
+               style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; background:#0a0a0f; display:none;"
+               id="gameWrapper">
+      <xhtml:iframe id="gameFrame" src="about:blank"></xhtml:iframe>
+    </xhtml:div>
+  </foreignObject>
+
+  <!-- Nex Script + Logic -->
+  <foreignObject x="0" y="0" width="0" height="0">
+    <xhtml:script xmlns="http://www.w3.org/1999/xhtml" src="https://cdn.jsdelivr.net/gh/UseNex/nex-js@f60df53fb5554e4e160c086b47bf71f6a213e42c/nex.min.js">
+    </xhtml:script>
+    <xhtml:script xmlns="http://www.w3.org/1999/xhtml">
+      <![CDATA[
+        // === GLOBALS ===
+        let allGames = [];
+
+        // === LAAD ALLE GAMES ===
+        function loadGames() {
+          const loading = document.getElementById('loadingIndicator');
+          const error = document.getElementById('errorIndicator');
+          const grid = document.getElementById('gameGrid');
+
+          if (!window.nex || !window.nex.metadata) {
+            setTimeout(loadGames, 500);
+            return;
+          }
+
+          try {
+            const games = window.nex.metadata.getAllMetadata();
+            allGames = Object.values(games);
+
+            if (allGames.length === 0) throw new Error('No games found');
+
+            loading.style.display = 'none';
+            error.style.display = 'none';
+            grid.style.display = 'block';
+
+            grid.innerHTML = '';
+
+            const cols = 6;
+            const spacing = 20;
+            const cardWidth = 260;
+            const cardHeight = 220;
+
+            let x = (1920 - (cols * (cardWidth + spacing) - spacing)) / 2;
+            let y = 160;
+
+            allGames.forEach((game, index) => {
+              const col = index % cols;
+              const row = Math.floor(index / cols);
+
+              const cx = x + col * (cardWidth + spacing);
+              const cy = y + row * (cardHeight + spacing);
+
+              const card = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+              card.setAttribute('class', 'game-card');
+              card.setAttribute('onclick', `loadGame('${game.alias}')`);
+              card.setAttribute('transform', `translate(${cx}, ${cy})`);
+
+              const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+              rect.setAttribute('width', cardWidth);
+              rect.setAttribute('height', cardHeight);
+              card.appendChild(rect);
+
+              // Thumbnail
+              const thumbRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+              thumbRect.setAttribute('x', 10);
+              thumbRect.setAttribute('y', 10);
+              thumbRect.setAttribute('width', cardWidth - 20);
+              thumbRect.setAttribute('height', 120);
+              thumbRect.setAttribute('rx', '6');
+              thumbRect.setAttribute('fill', '#0a0a0f');
+              card.appendChild(thumbRect);
+
+              // Thumbnail image
+              const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+              fo.setAttribute('x', 10);
+              fo.setAttribute('y', 10);
+              fo.setAttribute('width', cardWidth - 20);
+              fo.setAttribute('height', 120);
+
+              const imgDiv = document.createElement('xhtml:div');
+              imgDiv.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+              imgDiv.style.cssText = 'width:100%; height:100%; overflow:hidden; border-radius:6px; background:#0a0a0f; display:flex; align-items:center; justify-content:center;';
+              imgDiv.innerHTML = `<xhtml:img src="${game.img || ''}" alt="${game.name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:32px;color:#444466;\\'>🎮</span>';">`;
+              fo.appendChild(imgDiv);
+              card.appendChild(fo);
+
+              // Game naam
+              const name = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+              name.setAttribute('x', cardWidth / 2);
+              name.setAttribute('y', 158);
+              name.setAttribute('text-anchor', 'middle');
+              name.setAttribute('class', 'game-name');
+              name.textContent = game.name;
+              card.appendChild(name);
+
+              // Game categorie
+              const category = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+              category.setAttribute('x', cardWidth / 2);
+              category.setAttribute('y', 182);
+              category.setAttribute('text-anchor', 'middle');
+              category.setAttribute('class', 'game-category');
+              category.textContent = game.category || 'Game';
+              card.appendChild(category);
+
+              grid.appendChild(card);
+            });
+
+            console.log(`✅ ${allGames.length} games geladen!`);
+
+          } catch (err) {
+            console.error('Error:', err);
+            loading.style.display = 'none';
+            error.style.display = 'block';
+          }
+        }
+
+        // === LAAD GAME IN IFRAME ===
+        function loadGame(alias) {
+          const wrapper = document.getElementById('gameWrapper');
+          const frame = document.getElementById('gameFrame');
+
+          if (!wrapper || !frame) return;
+
+          // Genereer HTML voor de game
+          const gameHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>${alias}</title>
+              <script src="https://cdn.jsdelivr.net/gh/UseNex/nex-js@f60df53fb5554e4e160c086b47bf71f6a213e42c/nex.min.js"><\/script>
+              <style>
+                * { margin:0; padding:0; box-sizing:border-box; }
+                body { background:#0a0a0f; width:100vw; height:100vh; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+                nex-game { display:block; width:100vw; height:100vh; }
+              </style>
+            </head>
+            <body>
+              <nex-game id="game" alias="${alias}" gid="game-${Date.now()}"></nex-game>
+              <script>
+                const gid = document.getElementById('game').getAttribute('gid');
+                const checkReady = setInterval(() => {
+                  if (window.nex && window.nex[gid]) {
+                    clearInterval(checkReady);
+                    window.nex[gid].on('ready', () => {
+                      if (window.nex[gid]) window.nex[gid].start();
+                    });
+                    window.nex[gid].on('error', (err) => {
+                      console.error('Game error:', err);
+                    });
+                  }
+                }, 200);
+              <\/script>
+            </body>
+            </html>
+          `;
+
+          // Schrijf naar iframe
+          const doc = frame.contentDocument || frame.contentWindow.document;
+          doc.open();
+          doc.write(gameHTML);
+          doc.close();
+
+          // Toon wrapper
+          wrapper.style.display = 'block';
+        }
+
+        // === SLUIT GAME ===
+        function closeGame() {
+          const wrapper = document.getElementById('gameWrapper');
+          const frame = document.getElementById('gameFrame');
+
+          if (wrapper) wrapper.style.display = 'none';
+          if (frame) frame.src = 'about:blank';
+        }
+
+        // === BACK BUTTON IN SVG ===
+        // We maken een back button in de SVG die closeGame aanroept
+        function createBackButton() {
+          const container = document.getElementById('gameContainer');
+          if (!container) return;
+
+          // Voeg back button toe als SVG element
+          const backBtn = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          backBtn.setAttribute('class', 'back-btn');
+          backBtn.setAttribute('onclick', 'closeGame()');
+          backBtn.setAttribute('transform', 'translate(30, 30)');
+          backBtn.setAttribute('id', 'backButton');
+          backBtn.style.display = 'none';
+
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('width', '160');
+          rect.setAttribute('height', '44');
+          backBtn.appendChild(rect);
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', '80');
+          text.setAttribute('y', '28');
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('fill', '#ffffff');
+          text.setAttribute('font-family', 'Inter, sans-serif');
+          text.setAttribute('font-size', '14px');
+          text.textContent = '← Back to games';
+          backBtn.appendChild(text);
+
+          // Voeg toe aan SVG
+          const svg = document.getElementById('mainSvg');
+          svg.appendChild(backBtn);
+
+          // Monitor voor game container
+          const observer = new MutationObserver(() => {
+            const wrapper = document.getElementById('gameWrapper');
+            const backBtn = document.getElementById('backButton');
+            if (wrapper && backBtn) {
+              backBtn.style.display = wrapper.style.display === 'block' ? 'block' : 'none';
+            }
+          });
+
+          const wrapper = document.getElementById('gameWrapper');
+          if (wrapper) {
+            observer.observe(wrapper, { attributes: true, attributeFilter: ['style'] });
+          }
+        }
+
+        // === INITIALISEER ===
+        function init() {
+          if (window.nex && window.nex.metadata) {
+            loadGames();
+            createBackButton();
+          } else {
+            setTimeout(init, 500);
+          }
+        }
+
+        // Wacht tot DOM klaar is
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', init);
+        } else {
+          init();
+        }
+
+        // Fallback: blijf proberen
+        setTimeout(() => {
+          if (!window.nex || !window.nex.metadata) {
+            console.warn('⚠️ Nex niet geladen, probeer opnieuw...');
+            loadGames();
+          }
+        }, 3000);
+      ]]>
+    </xhtml:script>
+  </foreignObject>
+
+</svg>
