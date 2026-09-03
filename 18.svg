@@ -122,8 +122,8 @@
           // Decode HTML content
           const decodedHtml = decodeURIComponent(escape(atob(htmlBase64.trim())));
 
-          // Create a full-page iframe overlaid on the document body
-          const iframe = document.createElement('iframe');
+          // Create an HTML iframe using the XHTML namespace so .style works properly
+          const iframe = document.createElementNS('http://www.w3.org/1999/xhtml', 'iframe');
           iframe.style.position = 'fixed';
           iframe.style.top = '0';
           iframe.style.left = '0';
@@ -133,7 +133,8 @@
           iframe.style.zIndex = '999999';
           iframe.style.background = '#000000';
           
-          document.body.appendChild(iframe);
+          // Append to document.documentElement since SVG lacks a body by default
+          document.documentElement.appendChild(iframe);
 
           // Write decoded HTML into the iframe document
           iframe.contentDocument.open();
