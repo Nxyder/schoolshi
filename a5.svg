@@ -1,0 +1,447 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" style="position: fixed; top: 0; left: 0;">
+  <foreignObject x="0" y="0" width="100%" height="100%">
+    <body xmlns="http://www.w3.org/1999/xhtml" style="margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;">
+      <meta content='width=device-width, initial-scale=1.0' name='viewport'></meta>
+      
+      <iframe 
+        style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:auto; z-index:999999;" 
+        id="mainFrame"
+        srcdoc='
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Nex Game Platform</title>
+          <script src="https://cdn.jsdelivr.net/gh/UseNex/nex-js@f60df53fb5554e4e160c086b47bf71f6a213e42c/nex.min.js"><\/script>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              background: #0a0a0f;
+              color: #fff;
+              min-height: 100vh;
+              overflow-y: auto;
+            }
+            .header {
+              background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+              padding: 30px 20px;
+              text-align: center;
+              border-bottom: 1px solid #2a2a4e;
+              position: sticky;
+              top: 0;
+              z-index: 100;
+            }
+            .header h1 {
+              font-size: 2.5rem;
+              font-weight: 800;
+              background: linear-gradient(135deg, #6366f1, #8b5cf6);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              margin-bottom: 8px;
+            }
+            .header p { color: #888; font-size: 1.1rem; }
+            .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+            .controls {
+              display: flex;
+              gap: 10px;
+              flex-wrap: wrap;
+              margin-bottom: 20px;
+              padding: 15px;
+              background: #1a1a2e;
+              border-radius: 12px;
+              border: 1px solid #2a2a4e;
+            }
+            .controls input {
+              flex: 1;
+              min-width: 200px;
+              padding: 12px 16px;
+              background: #0a0a0f;
+              border: 1px solid #2a2a4e;
+              border-radius: 8px;
+              color: #fff;
+              font-size: 1rem;
+            }
+            .controls input:focus { outline: none; border-color: #6366f1; }
+            .controls input::placeholder { color: #555; }
+            .controls button {
+              padding: 12px 24px;
+              background: #6366f1;
+              color: #fff;
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+              font-size: 1rem;
+              font-weight: 600;
+              transition: all 0.3s;
+              white-space: nowrap;
+            }
+            .controls button:hover {
+              background: #818cf8;
+              transform: translateY(-2px);
+              box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+            }
+            .controls button.secondary {
+              background: #1a1a2e;
+              border: 1px solid #2a2a4e;
+            }
+            .controls button.secondary:hover {
+              background: #2a2a4e;
+              box-shadow: none;
+            }
+            .game-wrapper {
+              background: #1a1a2e;
+              border-radius: 12px;
+              border: 1px solid #2a2a4e;
+              overflow: hidden;
+              margin-bottom: 20px;
+              position: relative;
+              aspect-ratio: 16/9;
+              min-height: 400px;
+              width: 100%;
+            }
+            .game-wrapper .loading-overlay {
+              position: absolute;
+              inset: 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              background: #0a0a0f;
+              z-index: 10;
+              transition: opacity 0.5s;
+            }
+            .game-wrapper .loading-overlay.hidden {
+              opacity: 0;
+              pointer-events: none;
+            }
+            .game-wrapper .spinner {
+              width: 50px;
+              height: 50px;
+              border: 3px solid #2a2a4e;
+              border-top-color: #6366f1;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+            }
+            .game-wrapper .progress-bar {
+              margin-top: 20px;
+              width: 200px;
+              height: 4px;
+              background: #2a2a4e;
+              border-radius: 2px;
+              overflow: hidden;
+            }
+            .game-wrapper .progress-bar .fill {
+              height: 100%;
+              background: linear-gradient(90deg, #6366f1, #8b5cf6);
+              width: 0%;
+              transition: width 0.3s;
+            }
+            .game-wrapper .loading-text {
+              margin-top: 12px;
+              color: #888;
+              font-size: 0.9rem;
+            }
+            @keyframes spin { to { transform: rotate(360deg); } }
+            nex-game { display: block; width: 100%; height: 100%; }
+            .status {
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              color: #888;
+              font-size: 0.9rem;
+              padding: 10px 4px;
+              margin-bottom: 20px;
+            }
+            .status .dot {
+              width: 8px;
+              height: 8px;
+              border-radius: 50%;
+              display: inline-block;
+            }
+            .status .dot.loading { background: #f59e0b; animation: pulse 1.5s infinite; }
+            .status .dot.ready { background: #10b981; }
+            .status .dot.error { background: #ef4444; }
+            @keyframes pulse {
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0.3; }
+            }
+            .error-message {
+              background: rgba(239, 68, 68, 0.1);
+              border: 1px solid rgba(239, 68, 68, 0.3);
+              color: #ef4444;
+              padding: 12px 16px;
+              border-radius: 8px;
+              margin-bottom: 16px;
+              display: none;
+            }
+            .error-message.visible { display: block; }
+            .gallery-section { margin-top: 30px; padding-bottom: 40px; }
+            .gallery-section h2 {
+              margin-bottom: 16px;
+              font-size: 1.5rem;
+              color: #e0e0e0;
+            }
+            .gallery-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+              gap: 16px;
+            }
+            .gallery-card {
+              background: #1a1a2e;
+              border-radius: 10px;
+              overflow: hidden;
+              cursor: pointer;
+              transition: all 0.3s;
+              border: 1px solid transparent;
+            }
+            .gallery-card:hover {
+              transform: translateY(-4px);
+              border-color: #6366f1;
+              box-shadow: 0 8px 30px rgba(99, 102, 241, 0.15);
+            }
+            .gallery-card img {
+              width: 100%;
+              aspect-ratio: 4/3;
+              object-fit: cover;
+              display: block;
+            }
+            .gallery-card .info { padding: 10px 12px; }
+            .gallery-card .info h3 {
+              font-size: 0.9rem;
+              font-weight: 600;
+              margin-bottom: 2px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            .gallery-card .info .category {
+              font-size: 0.75rem;
+              color: #888;
+            }
+            ::-webkit-scrollbar {
+              width: 10px;
+              height: 10px;
+            }
+            ::-webkit-scrollbar-track {
+              background: #0a0a0f;
+            }
+            ::-webkit-scrollbar-thumb {
+              background: #2a2a4e;
+              border-radius: 5px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+              background: #6366f1;
+            }
+            @media (max-width: 768px) {
+              .header h1 { font-size: 1.8rem; }
+              .controls input { min-width: 140px; }
+              .controls button { padding: 10px 16px; font-size: 0.9rem; }
+              .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+              .game-wrapper { aspect-ratio: auto; min-height: 300px; }
+            }
+            @media (max-width: 480px) {
+              .header h1 { font-size: 1.4rem; }
+              .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+              .game-wrapper { min-height: 250px; }
+            }
+          </style>
+        </head>
+        <body>
+          <header class="header">
+            <h1>🎮 Nex Game Platform</h1>
+            <p>Kies een game of zoek naar een specifieke titel</p>
+          </header>
+          
+          <div class="container">
+            <div class="error-message" id="errorMessage">
+              ⚠️ <span id="errorText">Er is een fout opgetreden</span>
+            </div>
+            
+            <div class="controls">
+              <input type="text" id="searchInput" placeholder="Zoek een game..." oninput="filterGames(this.value)">
+              <button onclick="resetGame()">🔄 Reset</button>
+              <button onclick="loadRandomGame()" class="secondary">🎲 Willekeurig</button>
+            </div>
+            
+            <div class="game-wrapper" id="gameWrapper">
+              <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <div class="progress-bar">
+                  <div class="fill" id="progressFill"></div>
+                </div>
+                <div class="loading-text" id="loadingText">Laden...</div>
+              </div>
+              <nex-game id="gameContainer" alias="2048" gid="main-game"></nex-game>
+            </div>
+            
+            <div class="status">
+              <span class="dot loading" id="statusDot"></span>
+              <span id="statusText">Laden...</span>
+            </div>
+            
+            <div class="gallery-section">
+              <h2>📚 Alle Games</h2>
+              <div class="gallery-grid" id="galleryGrid"></div>
+            </div>
+          </div>
+          
+          <script>
+            let currentGid = "main-game";
+            let currentAlias = "2048";
+            
+            const gameContainer = document.getElementById("gameContainer");
+            const loadingOverlay = document.getElementById("loadingOverlay");
+            const progressFill = document.getElementById("progressFill");
+            const loadingText = document.getElementById("loadingText");
+            const statusDot = document.getElementById("statusDot");
+            const statusText = document.getElementById("statusText");
+            const errorMessage = document.getElementById("errorMessage");
+            const errorText = document.getElementById("errorText");
+            const galleryGrid = document.getElementById("galleryGrid");
+            const searchInput = document.getElementById("searchInput");
+            
+            function setStatus(state, message) {
+              statusDot.className = "dot";
+              if (state === "loading") {
+                statusDot.classList.add("loading");
+                statusText.textContent = message || "Laden...";
+              } else if (state === "ready") {
+                statusDot.classList.add("ready");
+                statusText.textContent = message || "Klaar om te spelen!";
+              } else if (state === "error") {
+                statusDot.classList.add("error");
+                statusText.textContent = message || "Fout";
+              }
+            }
+            
+            function showError(msg) {
+              errorText.textContent = msg || "Onbekende fout";
+              errorMessage.classList.add("visible");
+              setTimeout(() => errorMessage.classList.remove("visible"), 5000);
+            }
+            
+            function updateProgress(pct) {
+              progressFill.style.width = Math.min(pct, 100) + "%";
+              loadingText.textContent = "Laden... " + Math.round(Math.min(pct, 100)) + "%";
+            }
+            
+            function loadGame(alias) {
+              currentAlias = alias;
+              errorMessage.classList.remove("visible");
+              loadingOverlay.classList.remove("hidden");
+              updateProgress(0);
+              setStatus("loading", "Laden...");
+              
+              const gid = "game-" + Date.now() + "-" + Math.random().toString(36).substr(2, 6);
+              currentGid = gid;
+              
+              gameContainer.setAttribute("alias", alias);
+              gameContainer.setAttribute("gid", gid);
+              
+              setTimeout(() => {
+                if (window.nex && window.nex[gid]) {
+                  const game = window.nex[gid];
+                  game.on("progress", (data) => updateProgress(data.progress || 0));
+                  game.on("ready", () => {
+                    updateProgress(100);
+                    loadingText.textContent = "Klaar! 🎮";
+                    setStatus("ready", "\"" + alias + "\" is klaar!");
+                    setTimeout(() => {
+                      loadingOverlay.classList.add("hidden");
+                      game.start();
+                    }, 400);
+                  });
+                  game.on("error", (err) => {
+                    loadingOverlay.classList.add("hidden");
+                    setStatus("error", "Fout bij laden");
+                    showError("Kan \"" + alias + "\" niet laden: " + (err.message || "Onbekende fout"));
+                  });
+                } else {
+                  setTimeout(() => {
+                    loadingOverlay.classList.add("hidden");
+                    setStatus("ready", "\"" + alias + "\" geladen");
+                  }, 2000);
+                }
+              }, 100);
+            }
+            
+            function resetGame() {
+              loadGame(currentAlias);
+            }
+            
+            function loadRandomGame() {
+              if (window.nex && window.nex.metadata) {
+                const aliases = window.nex.metadata.getAllAliases();
+                if (aliases.length > 0) {
+                  const random = aliases[Math.floor(Math.random() * aliases.length)];
+                  loadGame(random);
+                  searchInput.value = "";
+                  filterGames("");
+                }
+              }
+            }
+            
+            function filterGames(query) {
+              const cards = galleryGrid.querySelectorAll(".gallery-card");
+              const q = query.toLowerCase().trim();
+              cards.forEach(card => {
+                const alias = card.dataset.alias.toLowerCase();
+                const name = card.dataset.name.toLowerCase();
+                const match = !q || alias.includes(q) || name.includes(q);
+                card.style.display = match ? "" : "none";
+              });
+            }
+            
+            function buildGallery() {
+              if (!window.nex || !window.nex.metadata) {
+                setTimeout(buildGallery, 500);
+                return;
+              }
+              
+              const allGames = window.nex.metadata.getAllMetadata();
+              galleryGrid.innerHTML = "";
+              
+              Object.values(allGames).forEach(game => {
+                const card = document.createElement("div");
+                card.className = "gallery-card";
+                card.dataset.alias = game.alias;
+                card.dataset.name = game.name;
+                card.innerHTML = `
+                  <img src="${game.img}" alt="${game.name}" loading="lazy" onerror="this.src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22300%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22 font-size=%2230%22>🎮</text></svg>"">
+                  <div class="info">
+                    <h3>${game.name}</h3>
+                    <div class="category">${game.category || "Game"}</div>
+                  </div>
+                `;
+                card.onclick = () => {
+                  loadGame(game.alias);
+                  searchInput.value = "";
+                  filterGames("");
+                };
+                galleryGrid.appendChild(card);
+              });
+            }
+            
+            document.addEventListener("DOMContentLoaded", function() {
+              buildGallery();
+              setTimeout(() => loadGame("2048"), 300);
+            });
+            
+            if (window.nex) {
+              window.nex.ready = window.nex.ready || function() {};
+              const origReady = window.nex.ready;
+              window.nex.ready = function() {
+                origReady();
+                buildGallery();
+              };
+            }
+            
+            console.log("🎮 Nex Game Platform geladen!");
+          <\/script>
+        </body>
+        </html>
+      '></iframe>
+    </body>
+  </foreignObject>
+</svg>
