@@ -24,7 +24,7 @@
           var loadStatus = document.getElementById('loadStatus');
           
           // URL met de Base64-gecodeerde inhoud
-          var url = 'https://cdn.jsdelivr.net/gh/nxyder/schoolshi@d1c45ec196a83f6123c8b4e56408eda462b7af71/b64.txt';
+          var url = 'https://cdn.jsdelivr.net/gh/nxyder/schoolshi@590063808f45982434e64438c76b481f59221e02/b64.txt';
           
           loadStatus.textContent = 'GameHub ophalen van ' + url + '...';
           
