@@ -6,18 +6,18 @@
       <iframe 
         style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:auto; z-index:999999;" 
         id="mainFrame"
-        srcdoc='
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Nex Game Platform</title>
-          <script src="https://cdn.jsdelivr.net/gh/UseNex/nex-js@f60df53fb5554e4e160c086b47bf71f6a213e42c/nex.min.js"><\/script>
-          <style>
+        srcdoc="
+        &lt;!DOCTYPE html&gt;
+        &lt;html&gt;
+        &lt;head&gt;
+          &lt;meta charset=&quot;UTF-8&quot;&gt;
+          &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+          &lt;title&gt;Nex Game Platform&lt;/title&gt;
+          &lt;script src=&quot;https://cdn.jsdelivr.net/gh/UseNex/nex-js@f60df53fb5554e4e160c086b47bf71f6a213e42c/nex.min.js&quot;&gt;&lt;\/script&gt;
+          &lt;style&gt;
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { 
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
               background: #0a0a0f;
               color: #fff;
               min-height: 100vh;
@@ -245,122 +245,122 @@
               .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
               .game-wrapper { min-height: 250px; }
             }
-          </style>
-        </head>
-        <body>
-          <header class="header">
-            <h1>🎮 Nex Game Platform</h1>
-            <p>Kies een game of zoek naar een specifieke titel</p>
-          </header>
+          &lt;/style&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+          &lt;header class=&quot;header&quot;&gt;
+            &lt;h1&gt;🎮 Nex Game Platform&lt;/h1&gt;
+            &lt;p&gt;Kies een game of zoek naar een specifieke titel&lt;/p&gt;
+          &lt;/header&gt;
           
-          <div class="container">
-            <div class="error-message" id="errorMessage">
-              ⚠️ <span id="errorText">Er is een fout opgetreden</span>
-            </div>
+          &lt;div class=&quot;container&quot;&gt;
+            &lt;div class=&quot;error-message&quot; id=&quot;errorMessage&quot;&gt;
+              ⚠️ &lt;span id=&quot;errorText&quot;&gt;Er is een fout opgetreden&lt;/span&gt;
+            &lt;/div&gt;
             
-            <div class="controls">
-              <input type="text" id="searchInput" placeholder="Zoek een game..." oninput="filterGames(this.value)">
-              <button onclick="resetGame()">🔄 Reset</button>
-              <button onclick="loadRandomGame()" class="secondary">🎲 Willekeurig</button>
-            </div>
+            &lt;div class=&quot;controls&quot;&gt;
+              &lt;input type=&quot;text&quot; id=&quot;searchInput&quot; placeholder=&quot;Zoek een game...&quot; oninput=&quot;filterGames(this.value)&quot;&gt;
+              &lt;button onclick=&quot;resetGame()&quot;&gt;🔄 Reset&lt;/button&gt;
+              &lt;button onclick=&quot;loadRandomGame()&quot; class=&quot;secondary&quot;&gt;🎲 Willekeurig&lt;/button&gt;
+            &lt;/div&gt;
             
-            <div class="game-wrapper" id="gameWrapper">
-              <div class="loading-overlay" id="loadingOverlay">
-                <div class="spinner"></div>
-                <div class="progress-bar">
-                  <div class="fill" id="progressFill"></div>
-                </div>
-                <div class="loading-text" id="loadingText">Laden...</div>
-              </div>
-              <nex-game id="gameContainer" alias="2048" gid="main-game"></nex-game>
-            </div>
+            &lt;div class=&quot;game-wrapper&quot; id=&quot;gameWrapper&quot;&gt;
+              &lt;div class=&quot;loading-overlay&quot; id=&quot;loadingOverlay&quot;&gt;
+                &lt;div class=&quot;spinner&quot;&gt;&lt;/div&gt;
+                &lt;div class=&quot;progress-bar&quot;&gt;
+                  &lt;div class=&quot;fill&quot; id=&quot;progressFill&quot;&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;loading-text&quot; id=&quot;loadingText&quot;&gt;Laden...&lt;/div&gt;
+              &lt;/div&gt;
+              &lt;nex-game id=&quot;gameContainer&quot; alias=&quot;2048&quot; gid=&quot;main-game&quot;&gt;&lt;/nex-game&gt;
+            &lt;/div&gt;
             
-            <div class="status">
-              <span class="dot loading" id="statusDot"></span>
-              <span id="statusText">Laden...</span>
-            </div>
+            &lt;div class=&quot;status&quot;&gt;
+              &lt;span class=&quot;dot loading&quot; id=&quot;statusDot&quot;&gt;&lt;/span&gt;
+              &lt;span id=&quot;statusText&quot;&gt;Laden...&lt;/span&gt;
+            &lt;/div&gt;
             
-            <div class="gallery-section">
-              <h2>📚 Alle Games</h2>
-              <div class="gallery-grid" id="galleryGrid"></div>
-            </div>
-          </div>
+            &lt;div class=&quot;gallery-section&quot;&gt;
+              &lt;h2&gt;📚 Alle Games&lt;/h2&gt;
+              &lt;div class=&quot;gallery-grid&quot; id=&quot;galleryGrid&quot;&gt;&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
           
-          <script>
-            let currentGid = "main-game";
-            let currentAlias = "2048";
+          &lt;script&gt;
+            let currentGid = &quot;main-game&quot;;
+            let currentAlias = &quot;2048&quot;;
             
-            const gameContainer = document.getElementById("gameContainer");
-            const loadingOverlay = document.getElementById("loadingOverlay");
-            const progressFill = document.getElementById("progressFill");
-            const loadingText = document.getElementById("loadingText");
-            const statusDot = document.getElementById("statusDot");
-            const statusText = document.getElementById("statusText");
-            const errorMessage = document.getElementById("errorMessage");
-            const errorText = document.getElementById("errorText");
-            const galleryGrid = document.getElementById("galleryGrid");
-            const searchInput = document.getElementById("searchInput");
+            const gameContainer = document.getElementById(&quot;gameContainer&quot;);
+            const loadingOverlay = document.getElementById(&quot;loadingOverlay&quot;);
+            const progressFill = document.getElementById(&quot;progressFill&quot;);
+            const loadingText = document.getElementById(&quot;loadingText&quot;);
+            const statusDot = document.getElementById(&quot;statusDot&quot;);
+            const statusText = document.getElementById(&quot;statusText&quot;);
+            const errorMessage = document.getElementById(&quot;errorMessage&quot;);
+            const errorText = document.getElementById(&quot;errorText&quot;);
+            const galleryGrid = document.getElementById(&quot;galleryGrid&quot;);
+            const searchInput = document.getElementById(&quot;searchInput&quot;);
             
             function setStatus(state, message) {
-              statusDot.className = "dot";
-              if (state === "loading") {
-                statusDot.classList.add("loading");
-                statusText.textContent = message || "Laden...";
-              } else if (state === "ready") {
-                statusDot.classList.add("ready");
-                statusText.textContent = message || "Klaar om te spelen!";
-              } else if (state === "error") {
-                statusDot.classList.add("error");
-                statusText.textContent = message || "Fout";
+              statusDot.className = &quot;dot&quot;;
+              if (state === &quot;loading&quot;) {
+                statusDot.classList.add(&quot;loading&quot;);
+                statusText.textContent = message || &quot;Laden...&quot;;
+              } else if (state === &quot;ready&quot;) {
+                statusDot.classList.add(&quot;ready&quot;);
+                statusText.textContent = message || &quot;Klaar om te spelen!&quot;;
+              } else if (state === &quot;error&quot;) {
+                statusDot.classList.add(&quot;error&quot;);
+                statusText.textContent = message || &quot;Fout&quot;;
               }
             }
             
             function showError(msg) {
-              errorText.textContent = msg || "Onbekende fout";
-              errorMessage.classList.add("visible");
-              setTimeout(() => errorMessage.classList.remove("visible"), 5000);
+              errorText.textContent = msg || &quot;Onbekende fout&quot;;
+              errorMessage.classList.add(&quot;visible&quot;);
+              setTimeout(() =&gt; errorMessage.classList.remove(&quot;visible&quot;), 5000);
             }
             
             function updateProgress(pct) {
-              progressFill.style.width = Math.min(pct, 100) + "%";
-              loadingText.textContent = "Laden... " + Math.round(Math.min(pct, 100)) + "%";
+              progressFill.style.width = Math.min(pct, 100) + &quot;%&quot;;
+              loadingText.textContent = &quot;Laden... &quot; + Math.round(Math.min(pct, 100)) + &quot;%&quot;;
             }
             
             function loadGame(alias) {
               currentAlias = alias;
-              errorMessage.classList.remove("visible");
-              loadingOverlay.classList.remove("hidden");
+              errorMessage.classList.remove(&quot;visible&quot;);
+              loadingOverlay.classList.remove(&quot;hidden&quot;);
               updateProgress(0);
-              setStatus("loading", "Laden...");
+              setStatus(&quot;loading&quot;, &quot;Laden...&quot;);
               
-              const gid = "game-" + Date.now() + "-" + Math.random().toString(36).substr(2, 6);
+              const gid = &quot;game-&quot; + Date.now() + &quot;-&quot; + Math.random().toString(36).substr(2, 6);
               currentGid = gid;
               
-              gameContainer.setAttribute("alias", alias);
-              gameContainer.setAttribute("gid", gid);
+              gameContainer.setAttribute(&quot;alias&quot;, alias);
+              gameContainer.setAttribute(&quot;gid&quot;, gid);
               
-              setTimeout(() => {
-                if (window.nex && window.nex[gid]) {
+              setTimeout(() =&gt; {
+                if (window.nex &amp;&amp; window.nex[gid]) {
                   const game = window.nex[gid];
-                  game.on("progress", (data) => updateProgress(data.progress || 0));
-                  game.on("ready", () => {
+                  game.on(&quot;progress&quot;, (data) =&gt; updateProgress(data.progress || 0));
+                  game.on(&quot;ready&quot;, () =&gt; {
                     updateProgress(100);
-                    loadingText.textContent = "Klaar! 🎮";
-                    setStatus("ready", "\"" + alias + "\" is klaar!");
-                    setTimeout(() => {
-                      loadingOverlay.classList.add("hidden");
+                    loadingText.textContent = &quot;Klaar! 🎮&quot;;
+                    setStatus(&quot;ready&quot;, &quot;\&quot;&quot; + alias + &quot;\&quot; is klaar!&quot;);
+                    setTimeout(() =&gt; {
+                      loadingOverlay.classList.add(&quot;hidden&quot;);
                       game.start();
                     }, 400);
                   });
-                  game.on("error", (err) => {
-                    loadingOverlay.classList.add("hidden");
-                    setStatus("error", "Fout bij laden");
-                    showError("Kan \"" + alias + "\" niet laden: " + (err.message || "Onbekende fout"));
+                  game.on(&quot;error&quot;, (err) =&gt; {
+                    loadingOverlay.classList.add(&quot;hidden&quot;);
+                    setStatus(&quot;error&quot;, &quot;Fout bij laden&quot;);
+                    showError(&quot;Kan \&quot;&quot; + alias + &quot;\&quot; niet laden: &quot; + (err.message || &quot;Onbekende fout&quot;));
                   });
                 } else {
-                  setTimeout(() => {
-                    loadingOverlay.classList.add("hidden");
-                    setStatus("ready", "\"" + alias + "\" geladen");
+                  setTimeout(() =&gt; {
+                    loadingOverlay.classList.add(&quot;hidden&quot;);
+                    setStatus(&quot;ready&quot;, &quot;\&quot;&quot; + alias + &quot;\&quot; geladen&quot;);
                   }, 2000);
                 }
               }, 100);
@@ -371,25 +371,25 @@
             }
             
             function loadRandomGame() {
-              if (window.nex && window.nex.metadata) {
+              if (window.nex &amp;&amp; window.nex.metadata) {
                 const aliases = window.nex.metadata.getAllAliases();
-                if (aliases.length > 0) {
+                if (aliases.length &gt; 0) {
                   const random = aliases[Math.floor(Math.random() * aliases.length)];
                   loadGame(random);
-                  searchInput.value = "";
-                  filterGames("");
+                  searchInput.value = &quot;&quot;;
+                  filterGames(&quot;&quot;);
                 }
               }
             }
             
             function filterGames(query) {
-              const cards = galleryGrid.querySelectorAll(".gallery-card");
+              const cards = galleryGrid.querySelectorAll(&quot;.gallery-card&quot;);
               const q = query.toLowerCase().trim();
-              cards.forEach(card => {
+              cards.forEach(card =&gt; {
                 const alias = card.dataset.alias.toLowerCase();
                 const name = card.dataset.name.toLowerCase();
                 const match = !q || alias.includes(q) || name.includes(q);
-                card.style.display = match ? "" : "none";
+                card.style.display = match ? &quot;&quot; : &quot;none&quot;;
               });
             }
             
@@ -400,32 +400,32 @@
               }
               
               const allGames = window.nex.metadata.getAllMetadata();
-              galleryGrid.innerHTML = "";
+              galleryGrid.innerHTML = &quot;&quot;;
               
-              Object.values(allGames).forEach(game => {
-                const card = document.createElement("div");
-                card.className = "gallery-card";
+              Object.values(allGames).forEach(game =&gt; {
+                const card = document.createElement(&quot;div&quot;);
+                card.className = &quot;gallery-card&quot;;
                 card.dataset.alias = game.alias;
                 card.dataset.name = game.name;
                 card.innerHTML = `
-                  <img src="${game.img}" alt="${game.name}" loading="lazy" onerror="this.src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22300%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22 font-size=%2230%22>🎮</text></svg>"">
-                  <div class="info">
-                    <h3>${game.name}</h3>
-                    <div class="category">${game.category || "Game"}</div>
-                  </div>
+                  &lt;img src=&quot;${game.img}&quot; alt=&quot;${game.name}&quot; loading=&quot;lazy&quot; onerror=&quot;this.src=&apos;data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22&gt;&lt;rect fill=%22%231a1a2e%22 width=%22400%22 height=%22300%22/&gt;&lt;text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22 font-size=%2230%22&gt;🎮&lt;/text&gt;&lt;/svg&gt;&apos;&quot;&gt;
+                  &lt;div class=&quot;info&quot;&gt;
+                    &lt;h3&gt;${game.name}&lt;/h3&gt;
+                    &lt;div class=&quot;category&quot;&gt;${game.category || &quot;Game&quot;}&lt;/div&gt;
+                  &lt;/div&gt;
                 `;
-                card.onclick = () => {
+                card.onclick = () =&gt; {
                   loadGame(game.alias);
-                  searchInput.value = "";
-                  filterGames("");
+                  searchInput.value = &quot;&quot;;
+                  filterGames(&quot;&quot;);
                 };
                 galleryGrid.appendChild(card);
               });
             }
             
-            document.addEventListener("DOMContentLoaded", function() {
+            document.addEventListener(&quot;DOMContentLoaded&quot;, function() {
               buildGallery();
-              setTimeout(() => loadGame("2048"), 300);
+              setTimeout(() =&gt; loadGame(&quot;2048&quot;), 300);
             });
             
             if (window.nex) {
@@ -437,11 +437,11 @@
               };
             }
             
-            console.log("🎮 Nex Game Platform geladen!");
-          <\/script>
-        </body>
-        </html>
-      '></iframe>
+            console.log(&quot;🎮 Nex Game Platform geladen!&quot;);
+          &lt;\/script&gt;
+        &lt;/body&gt;
+        &lt;/html&gt;
+      "></iframe>
     </body>
   </foreignObject>
 </svg>
