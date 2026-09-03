@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" style="position: fixed; top: 0; left: 0; margin: 0; padding: 0; overflow: hidden;">
+  <foreignObject x="0" y="0" width="100%" height="100%" style="margin: 0; padding: 0; overflow: hidden;">
+    <body xmlns="http://www.w3.org/1999/xhtml" style="margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background:#0a0a0f;">
+      <meta content='width=device-width, initial-scale=1.0' name='viewport'></meta>
+      
+      <iframe 
+        style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;" 
+        id="mainFrame"
+        src="about:blank">
+      </iframe>
+      
+      <script type="text/javascript">
+        <![CDATA[
+        (function() {
+          var iframe = document.getElementById('mainFrame');
+          var doc = iframe.contentDocument || iframe.contentWindow.document;
+          doc.open();
+          doc.write('<!DOCTYPE html>\n');
+          doc.write('<html>\n');
+          doc.write('<head>\n');
+          doc.write('  <meta charset="UTF-8">\n');
+          doc.write('  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n');
+          doc.write('  <title>Race Survival Arena King Full</title>\n');
+          doc.write('  <style>\n');
+          doc.write('    * { margin: 0; padding: 0; box-sizing: border-box; }\n');
+          doc.write('    html, body { \n');
+          doc.write('      margin: 0;\n');
+          doc.write('      padding: 0;\n');
+          doc.write('      overflow: hidden;\n');
+          doc.write('      width: 100%;\n');
+          doc.write('      height: 100%;\n');
+          doc.write('      background: #0a0a0f;\n');
+          doc.write('    }\n');
+          doc.write('    nex-game { \n');
+          doc.write('      display: block; \n');
+          doc.write('      width: 100vw; \n');
+          doc.write('      height: 100vh; \n');
+          doc.write('      margin: 0;\n');
+          doc.write('      padding: 0;\n');
+          doc.write('    }\n');
+          doc.write('    .loading-overlay {\n');
+          doc.write('      position: fixed;\n');
+          doc.write('      top: 0;\n');
+          doc.write('      left: 0;\n');
+          doc.write('      width: 100%;\n');
+          doc.write('      height: 100%;\n');
+          doc.write('      display: flex;\n');
+          doc.write('      flex-direction: column;\n');
+          doc.write('      align-items: center;\n');
+          doc.write('      justify-content: center;\n');
+          doc.write('      background: #0a0a0f;\n');
+          doc.write('      z-index: 10;\n');
+          doc.write('      transition: opacity 0.5s;\n');
+          doc.write('    }\n');
+          doc.write('    .loading-overlay.hidden {\n');
+          doc.write('      opacity: 0;\n');
+          doc.write('      pointer-events: none;\n');
+          doc.write('    }\n');
+          doc.write('    .spinner {\n');
+          doc.write('      width: 60px;\n');
+          doc.write('      height: 60px;\n');
+          doc.write('      border: 4px solid #2a2a4e;\n');
+          doc.write('      border-top-color: #6366f1;\n');
+          doc.write('      border-radius: 50%;\n');
+          doc.write('      animation: spin 1s linear infinite;\n');
+          doc.write('    }\n');
+          doc.write('    .loading-text {\n');
+          doc.write('      margin-top: 20px;\n');
+          doc.write('      color: #888;\n');
+          doc.write('      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;\n');
+          doc.write('      font-size: 1.2rem;\n');
+          doc.write('    }\n');
+          doc.write('    .game-title {\n');
+          doc.write('      color: #6366f1;\n');
+          doc.write('      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;\n');
+          doc.write('      font-size: 1.8rem;\n');
+          doc.write('      font-weight: 800;\n');
+          doc.write('      margin-bottom: 10px;\n');
+          doc.write('      text-align: center;\n');
+          doc.write('    }\n');
+          doc.write('    @keyframes spin { to { transform: rotate(360deg); } }\n');
+          doc.write('  <\/style>\n');
+          doc.write('  <script src="https://cdn.jsdelivr.net/gh/UseNex/nex-js@f60df53fb5554e4e160c086b47bf71f6a213e42c/nex.min.js"><\/script>\n');
+          doc.write('<\/head>\n');
+          doc.write('<body>\n');
+          doc.write('  <div class="loading-overlay" id="loadingOverlay">\n');
+          doc.write('    <div class="game-title">🏁 Race Survival Arena King Full</div>\n');
+          doc.write('    <div class="spinner"><\/div>\n');
+          doc.write('    <div class="loading-text" id="loadingText">Laden... 0%<\/div>\n');
+          doc.write('  <\/div>\n');
+          doc.write('  <nex-game id="gameContainer" alias="race-survival-arena-king-full" gid="main-game"><\/nex-game>\n');
+          doc.write('  \n');
+          doc.write('  <script>\n');
+          doc.write('    var gid = "main-game";\n');
+          doc.write('    var gameContainer = document.getElementById("gameContainer");\n');
+          doc.write('    var loadingOverlay = document.getElementById("loadingOverlay");\n');
+          doc.write('    var loadingText = document.getElementById("loadingText");\n');
+          doc.write('    \n');
+          doc.write('    function updateProgress(pct) {\n');
+          doc.write('      loadingText.textContent = "Laden... " + Math.round(Math.min(pct, 100)) + "%";\n');
+          doc.write('    }\n');
+          doc.write('    \n');
+          doc.write('    function startGame() {\n');
+          doc.write('      if (window.nex && window.nex[gid]) {\n');
+          doc.write('        var game = window.nex[gid];\n');
+          doc.write('        \n');
+          doc.write('        game.on("progress", function(data) {\n');
+          doc.write('          updateProgress(data.progress || 0);\n');
+          doc.write('        });\n');
+          doc.write('        \n');
+          doc.write('        game.on("ready", function() {\n');
+          doc.write('          loadingText.textContent = "Klaar! 🎮";\n');
+          doc.write('          setTimeout(function() {\n');
+          doc.write('            loadingOverlay.classList.add("hidden");\n');
+          doc.write('            game.start();\n');
+          doc.write('          }, 500);\n');
+          doc.write('        });\n');
+          doc.write('        \n');
+          doc.write('        game.on("error", function(err) {\n');
+          doc.write('          loadingText.textContent = "Fout: " + (err.message || "Onbekend");\n');
+          doc.write('          setTimeout(function() {\n');
+          doc.write('            loadingOverlay.classList.add("hidden");\n');
+          doc.write('          }, 2000);\n');
+          doc.write('        });\n');
+          doc.write('      } else {\n');
+          doc.write('        setTimeout(function() {\n');
+          doc.write('          loadingOverlay.classList.add("hidden");\n');
+          doc.write('        }, 3000);\n');
+          doc.write('      }\n');
+          doc.write('    }\n');
+          doc.write('    \n');
+          doc.write('    document.addEventListener("DOMContentLoaded", function() {\n');
+          doc.write('      setTimeout(startGame, 200);\n');
+          doc.write('    });\n');
+          doc.write('    \n');
+          doc.write('    if (window.nex) {\n');
+          doc.write('      window.nex.ready = window.nex.ready || function() {};\n');
+          doc.write('      var origReady = window.nex.ready;\n');
+          doc.write('      window.nex.ready = function() {\n');
+          doc.write('        origReady();\n');
+          doc.write('        startGame();\n');
+          doc.write('      };\n');
+          doc.write('    }\n');
+          doc.write('    \n');
+          doc.write('    console.log("🎮 Race Survival Arena King Full geladen!");\n');
+          doc.write('  <\/script>\n');
+          doc.write('<\/body>\n');
+          doc.write('<\/html>');
+          doc.close();
+        })();
+        ]]>
+      </script>
+    </body>
+  </foreignObject>
+</svg>
