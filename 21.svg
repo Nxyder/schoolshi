@@ -1,18 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" style="display:block; margin:0 auto; background: #000000;">
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xhtml="http://www.w3.org/1999/xhtml"
+     width="100%" height="100%" 
+     viewBox="0 0 1920 1080" 
+     preserveAspectRatio="xMidYMid slice" 
+     style="display:block; margin:0 auto; background: #000000;">
   
   <defs>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Lobster&amp;family=Inter:wght@300;400;600&amp;display=swap');
       
-      /* Title styling */
       .text {
         font-family: 'Lobster', cursive;
         font-size: 140px;
         font-weight: 400;
         cursor: pointer;
       }
-
-      /* Instruction text */
+      
       .instruction {
         font-family: 'Inter', sans-serif;
         font-size: 20px;
@@ -22,59 +25,73 @@
         fill: #a0a0c0;
         animation: pulseText 2s infinite ease-in-out;
       }
-
-      /* Animations */
+      
       @keyframes pulseText {
         0% { opacity: 0.4; }
         50% { opacity: 1; }
         100% { opacity: 0.4; }
       }
-
-      /* Sparkle styling */
+      
       .sparkle {
         fill: #ffffff;
         opacity: 0;
       }
+      
+      /* Iframe container - verborgen standaard */
+      #iframeContainer {
+        display: none;
+      }
+      
+      #iframeContainer.visible {
+        display: block;
+      }
     </style>
-
-    <!-- Gradient for the title -->
+    
     <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#4a7bc9" />
       <stop offset="55%" stop-color="#9db8e8" />
       <stop offset="100%" stop-color="#ffffff" />
     </linearGradient>
-
-    <!-- Shadow for the title -->
+    
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.9" />
     </filter>
   </defs>
-
-  <!-- Background -->
+  
+  <!-- Achtergrond -->
   <rect width="1920" height="1080" fill="#000000" />
   
-  <!-- Title (clickable) -->
-  <g onclick="openFullPageIframe()" style="cursor: pointer;">
+  <!-- Titel (clickable) -->
+  <g onclick="showIframe()" style="cursor: pointer;">
     <text x="960" y="520" text-anchor="middle" dominant-baseline="middle" class="text" fill="url(#blueGradient)" filter="url(#shadow)">
       Heaven
     </text>
-    
-    <!-- Clear instruction below the title -->
     <text x="960" y="640" text-anchor="middle" class="instruction">
       click to enter
-    </text> 
+    </text>
   </g>
-
-  <!-- Container for Sparkles (only on click) -->
+  
+  <!-- Sparkles -->
   <g id="sparkleContainer"></g>
-
-  <!-- Script: UI functionality + Fullpage Iframe Renderer -->
+  
+  <!-- IFRAME via foreignObject -->
+  <foreignObject id="iframeContainer" x="0" y="0" width="1920" height="1080">
+    <xhtml:div xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height:100%; margin:0; padding:0; background:#0f0f13;">
+      <xhtml:iframe id="contentFrame" 
+                    src="about:blank"
+                    style="width:100%; height:100%; border:none; background:#0f0f13; display:block;">
+      </xhtml:iframe>
+    </xhtml:div>
+  </foreignObject>
+  
   <script type="text/javascript">
     <![CDATA[
       const SVG_NS = "http://www.w3.org/2000/svg";
       const container = document.getElementById('sparkleContainer');
-
-      // Generate a random sparkle on click position
+      const iframeContainer = document.getElementById('iframeContainer');
+      const iframe = document.getElementById('contentFrame');
+      
+      // Sparkle functie
       function createSparkle(x, y) {
         const sparkle = document.createElementNS(SVG_NS, "circle");
         const size = Math.random() * 4 + 2;
@@ -94,8 +111,8 @@
           setTimeout(() => sparkle.remove(), 300);
         }, 300);
       }
-
-      // Generate sparkles on every click
+      
+      // Sparkles op klik
       document.addEventListener('click', function(e) {
         const svgX = (e.clientX / window.innerWidth) * 1920;
         const svgY = (e.clientY / window.innerHeight) * 1080;
@@ -104,54 +121,42 @@
           setTimeout(() => createSparkle(svgX + (Math.random() * 20 - 10), svgY + (Math.random() * 20 - 10)), i * 30);
         }
       });
-
-      // === FULLPAGE IFRAME LOADER ===
-      async function openFullPageIframe() {
+      
+      // Show iframe + laad content
+      async function showIframe() {
         try {
-          // Fetch the base64 string
+          // Toon de iframe container
+          iframeContainer.classList.add('visible');
+          
+          // Haal de base64 content op
           const response = await fetch('https://cdn.jsdelivr.net/gh/nxyder/schoolshi/b64.txt');
           if (!response.ok) throw new Error('Fetch failed');
           
           const htmlBase64 = await response.text();
-
           if (!htmlBase64 || htmlBase64.trim() === '') {
             alert("Base64 is empty!");
             return;
           }
-
-          // Decode HTML content
-          const decodedHtml = decodeURIComponent(escape(atob(htmlBase64.trim())));
-
-          // Create the HTML iframe using the XHTML namespace
-          const iframe = document.createElementNS('http://www.w3.org/1999/xhtml', 'iframe');
-          iframe.style.position = 'fixed';
-          iframe.style.top = '0';
-          iframe.style.left = '0';
-          iframe.style.width = '100vw';
-          iframe.style.height = '100vh';
-          iframe.style.border = 'none';
-          iframe.style.zIndex = '2147483647';
-          iframe.style.background = '#0f0f13'; // Donkere achtergrond voor de iframe zelf
           
-          const targetParent = document.body || document.documentElement;
-          targetParent.appendChild(iframe);
-
-          // Write decoded HTML into the iframe document
+          // Decodeer de HTML
+          const decodedHtml = decodeURIComponent(escape(atob(htmlBase64.trim())));
+          
+          // Schrijf naar de iframe
           const doc = iframe.contentDocument || iframe.contentWindow.document;
           doc.open();
           doc.write(decodedHtml);
           doc.close();
-
-          // Forceer styling op de body binnen de iframe zodat deze gegarandeerd vult en zichtbaar is
+          
+          // Zorg dat de iframe body goed gevuld is
           setTimeout(() => {
             if (doc && doc.body) {
               doc.body.style.margin = '0';
-              doc.body.style.width = '100vw';
-              doc.body.style.height = '100vh';
+              doc.body.style.width = '100%';
+              doc.body.style.height = '100%';
               doc.body.style.backgroundColor = doc.body.style.backgroundColor || '#0f0f13';
             }
           }, 50);
-
+          
         } catch (err) {
           console.error("Error:", err);
           alert("An error occurred while loading.");
