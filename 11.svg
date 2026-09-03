@@ -26,8 +26,8 @@
   <!-- Zwarte achtergrond -->
   <rect width="1920" height="1080" fill="#000000" />
 
-  <!-- De tekst (iets boven het midden geplaatst zoals in de afbeelding) -->
-  <text x="960" y="500" text-anchor="middle" class="text" fill="url(#blueGradient)" filter="url(#shadow)">
+  <!-- De tekst perfect gecentreerd (X=960, Y=540 + dominant-baseline="middle") -->
+  <text x="960" y="540" text-anchor="middle" dominant-baseline="middle" class="text" fill="url(#blueGradient)" filter="url(#shadow)">
     Anonymous
   </text>
 
