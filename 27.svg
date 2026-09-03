@@ -3,7 +3,7 @@
      id="mainSvg"
      width="100%" height="100%" 
      viewBox="0 0 1920 1080" 
-     preserveAspectRatio="xMidYMid meet"
+     preserveAspectRatio="none"
      style="display:block; margin:0 auto; background: #000000; position:fixed; top:0; left:0; width:100vw; height:100vh;">
   
   <defs>
@@ -67,16 +67,16 @@
   </defs>
   
   <!-- Achtergrond -->
-  <rect width="1920" height="1080" fill="#000000" />
+  <rect width="100%" height="100%" fill="#000000" />
   
-  <!-- Groep met inhoud die we willen schalen -->
+  <!-- Groep met inhoud die we willen stretchen -->
   <g id="contentGroup">
     <!-- Titel (clickable) -->
     <g onclick="showIframe()" style="cursor: pointer;">
-      <text x="960" y="520" text-anchor="middle" dominant-baseline="middle" class="text" fill="url(#blueGradient)" filter="url(#shadow)">
+      <text id="titleText" x="50%" y="48%" text-anchor="middle" dominant-baseline="middle" class="text" fill="url(#blueGradient)" filter="url(#shadow)">
         Heaven
       </text>
-      <text x="960" y="640" text-anchor="middle" class="instruction">
+      <text id="instructionText" x="50%" y="60%" text-anchor="middle" class="instruction">
         click to enter
       </text>
     </g>
@@ -88,7 +88,7 @@
   <!-- IFRAME via foreignObject -->
   <foreignObject id="iframeContainer" 
                  x="0" y="0" 
-                 width="1920" height="1080" 
+                 width="100%" height="100%" 
                  style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; pointer-events:none;">
     <xhtml:div xmlns="http://www.w3.org/1999/xhtml" 
                style="width:100vw; height:100vh; margin:0; padding:0; background:#0f0f13; position:fixed; top:0; left:0;">
@@ -106,34 +106,36 @@
       const iframeContainer = document.getElementById('iframeContainer');
       const iframe = document.getElementById('contentFrame');
       const svg = document.getElementById('mainSvg');
-      const contentGroup = document.getElementById('contentGroup');
+      const titleText = document.getElementById('titleText');
+      const instructionText = document.getElementById('instructionText');
       
-      // === FUNCTIE: INHOUD SCHALEN ===
-      function scaleContent() {
+      // === FUNCTIE: TEKST GROOTTE AANPASSEN ===
+      function stretchContent() {
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
         
-        // Bereken de schaal zodat de inhoud het scherm vult
-        const scaleX = windowWidth / 1920;
-        const scaleY = windowHeight / 1080;
+        // Bereken de fontsize op basis van schermgrootte
+        const baseSize = Math.min(windowWidth, windowHeight) * 0.15; // 15% van de kleinste zijde
         
-        // Gebruik de grootste schaal om het scherm te vullen
-        // (hierdoor snijdt hij af aan de randen, maar de content is groot en zichtbaar)
-        const scale = Math.max(scaleX, scaleY);
+        // Pas de fontsize van de titel aan
+        titleText.style.fontSize = Math.max(baseSize, 40) + 'px';
         
-        // Center de inhoud
-        const offsetX = (windowWidth - (1920 * scale)) / 2;
-        const offsetY = (windowHeight - (1080 * scale)) / 2;
+        // Pas de fontsize van de instructie aan
+        instructionText.style.fontSize = Math.max(baseSize * 0.15, 14) + 'px';
         
-        // Pas transform toe op de content group
-        contentGroup.setAttribute('transform', `translate(${offsetX}, ${offsetY}) scale(${scale})`);
-        
-        // Zorg dat de SVG zelf het hele scherm vult
+        // Zorg dat de SVG het hele scherm vult
         svg.style.width = windowWidth + 'px';
         svg.style.height = windowHeight + 'px';
         svg.style.position = 'fixed';
         svg.style.top = '0';
         svg.style.left = '0';
+        
+        // Zorg dat de achtergrond het hele scherm vult
+        const bgRect = document.querySelector('rect');
+        if (bgRect) {
+          bgRect.setAttribute('width', '100%');
+          bgRect.setAttribute('height', '100%');
+        }
       }
       
       // === SPARKLE FUNCTIE ===
@@ -160,11 +162,11 @@
       // === SPARKLES OP KLIK ===
       document.addEventListener('click', function(e) {
         const rect = svg.getBoundingClientRect();
-        const svgX = ((e.clientX - rect.left) / rect.width) * 1920;
-        const svgY = ((e.clientY - rect.top) / rect.height) * 1080;
+        const svgX = ((e.clientX - rect.left) / rect.width) * 100;
+        const svgY = ((e.clientY - rect.top) / rect.height) * 100;
         
         for (let i = 0; i < 5; i++) {
-          setTimeout(() => createSparkle(svgX + (Math.random() * 20 - 10), svgY + (Math.random() * 20 - 10)), i * 30);
+          setTimeout(() => createSparkle(svgX + (Math.random() * 2 - 1), svgY + (Math.random() * 2 - 1)), i * 30);
         }
       });
       
@@ -224,14 +226,13 @@
       
       // === INITIALISEER ===
       window.addEventListener('load', function() {
-        scaleContent();
-        // Voeg een kleine vertraging toe voor de zekerheid
-        setTimeout(scaleContent, 100);
+        stretchContent();
+        setTimeout(stretchContent, 100);
       });
       
-      window.addEventListener('resize', scaleContent);
+      window.addEventListener('resize', stretchContent);
       window.addEventListener('orientationchange', function() {
-        setTimeout(scaleContent, 300);
+        setTimeout(stretchContent, 300);
       });
       
       // Fullscreen op dubbelklik
@@ -245,7 +246,7 @@
       
       // Forceer herschaling na volledige laden
       document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(scaleContent, 200);
+        setTimeout(stretchContent, 200);
       });
     ]]>
   </script>
