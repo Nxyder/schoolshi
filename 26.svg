@@ -3,8 +3,8 @@
      id="mainSvg"
      width="100%" height="100%" 
      viewBox="0 0 1920 1080" 
-     preserveAspectRatio="none"
-     style="display:block; margin:0 auto; background: #000000;">
+     preserveAspectRatio="xMidYMid meet"
+     style="display:block; margin:0 auto; background: #000000; position:fixed; top:0; left:0; width:100vw; height:100vh;">
   
   <defs>
     <style>
@@ -69,14 +69,17 @@
   <!-- Achtergrond -->
   <rect width="1920" height="1080" fill="#000000" />
   
-  <!-- Titel (clickable) -->
-  <g onclick="showIframe()" style="cursor: pointer;">
-    <text x="960" y="520" text-anchor="middle" dominant-baseline="middle" class="text" fill="url(#blueGradient)" filter="url(#shadow)">
-      Heaven
-    </text>
-    <text x="960" y="640" text-anchor="middle" class="instruction">
-      click to enter
-    </text>
+  <!-- Groep met inhoud die we willen schalen -->
+  <g id="contentGroup">
+    <!-- Titel (clickable) -->
+    <g onclick="showIframe()" style="cursor: pointer;">
+      <text x="960" y="520" text-anchor="middle" dominant-baseline="middle" class="text" fill="url(#blueGradient)" filter="url(#shadow)">
+        Heaven
+      </text>
+      <text x="960" y="640" text-anchor="middle" class="instruction">
+        click to enter
+      </text>
+    </g>
   </g>
   
   <!-- Sparkles -->
@@ -103,46 +106,34 @@
       const iframeContainer = document.getElementById('iframeContainer');
       const iframe = document.getElementById('contentFrame');
       const svg = document.getElementById('mainSvg');
+      const contentGroup = document.getElementById('contentGroup');
       
-      // === FUNCTIE: SVG GROOTTE AANPASSEN ===
-      function fitSVGToScreen() {
+      // === FUNCTIE: INHOUD SCHALEN ===
+      function scaleContent() {
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
         
-        // Zet SVG op volledig scherm
+        // Bereken de schaal zodat de inhoud het scherm vult
+        const scaleX = windowWidth / 1920;
+        const scaleY = windowHeight / 1080;
+        
+        // Gebruik de grootste schaal om het scherm te vullen
+        // (hierdoor snijdt hij af aan de randen, maar de content is groot en zichtbaar)
+        const scale = Math.max(scaleX, scaleY);
+        
+        // Center de inhoud
+        const offsetX = (windowWidth - (1920 * scale)) / 2;
+        const offsetY = (windowHeight - (1080 * scale)) / 2;
+        
+        // Pas transform toe op de content group
+        contentGroup.setAttribute('transform', `translate(${offsetX}, ${offsetY}) scale(${scale})`);
+        
+        // Zorg dat de SVG zelf het hele scherm vult
+        svg.style.width = windowWidth + 'px';
+        svg.style.height = windowHeight + 'px';
         svg.style.position = 'fixed';
         svg.style.top = '0';
         svg.style.left = '0';
-        svg.style.width = windowWidth + 'px';
-        svg.style.height = windowHeight + 'px';
-        svg.style.margin = '0';
-        svg.style.padding = '0';
-        
-        // Bereken schaal zodat de inhoud groter wordt
-        const svgAspect = 1920 / 1080;
-        const windowAspect = windowWidth / windowHeight;
-        
-        // Bepaal welke schaal het grootst is (zodat de SVG het scherm vult)
-        let scaleX = windowWidth / 1920;
-        let scaleY = windowHeight / 1080;
-        
-        // Gebruik de grootste schaal zodat de SVG het scherm vult
-        // (hierdoor snijdt hij af aan de randen, maar de content is groot)
-        const scale = Math.max(scaleX, scaleY);
-        
-        // Pas de viewBox aan met de berekende schaal
-        const newWidth = 1920 * scale;
-        const newHeight = 1080 * scale;
-        const offsetX = (windowWidth - newWidth) / 2;
-        const offsetY = (windowHeight - newHeight) / 2;
-        
-        // Gebruik transform om de SVG te schalen en centreren
-        svg.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
-        svg.style.transformOrigin = '0 0';
-        
-        // Zorg dat de SVG de juiste grootte heeft voor de transform
-        svg.style.width = '1920px';
-        svg.style.height = '1080px';
       }
       
       // === SPARKLE FUNCTIE ===
@@ -233,14 +224,14 @@
       
       // === INITIALISEER ===
       window.addEventListener('load', function() {
-        fitSVGToScreen();
-        // Zorg dat de SVG altijd bovenop ligt
-        svg.style.zIndex = '1';
+        scaleContent();
+        // Voeg een kleine vertraging toe voor de zekerheid
+        setTimeout(scaleContent, 100);
       });
       
-      window.addEventListener('resize', fitSVGToScreen);
+      window.addEventListener('resize', scaleContent);
       window.addEventListener('orientationchange', function() {
-        setTimeout(fitSVGToScreen, 300);
+        setTimeout(scaleContent, 300);
       });
       
       // Fullscreen op dubbelklik
@@ -250,6 +241,11 @@
         } else {
           document.exitFullscreen().catch(() => {});
         }
+      });
+      
+      // Forceer herschaling na volledige laden
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(scaleContent, 200);
       });
     ]]>
   </script>
