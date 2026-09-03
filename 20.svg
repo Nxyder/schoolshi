@@ -130,10 +130,9 @@
           iframe.style.width = '100vw';
           iframe.style.height = '100vh';
           iframe.style.border = 'none';
-          iframe.style.zIndex = '2147483647'; // Maximaal mogelijke z-index om zeker boven alles te staan
-          iframe.style.background = '#000000';
+          iframe.style.zIndex = '2147483647';
+          iframe.style.background = '#0f0f13'; // Donkere achtergrond voor de iframe zelf
           
-          // Voeg de iframe toe aan de host-pagina body (als die er is) of anders aan de root
           const targetParent = document.body || document.documentElement;
           targetParent.appendChild(iframe);
 
@@ -142,6 +141,16 @@
           doc.open();
           doc.write(decodedHtml);
           doc.close();
+
+          // Forceer styling op de body binnen de iframe zodat deze gegarandeerd vult en zichtbaar is
+          setTimeout(() => {
+            if (doc && doc.body) {
+              doc.body.style.margin = '0';
+              doc.body.style.width = '100vw';
+              doc.body.style.height = '100vh';
+              doc.body.style.backgroundColor = doc.body.style.backgroundColor || '#0f0f13';
+            }
+          }, 50);
 
         } catch (err) {
           console.error("Error:", err);
