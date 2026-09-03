@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" 
      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+     id="mainSvg"
      width="100%" height="100%" 
      viewBox="0 0 1920 1080" 
      preserveAspectRatio="xMidYMid meet"
@@ -37,7 +38,6 @@
         opacity: 0;
       }
       
-      /* Iframe container - full viewport met fixed positioning */
       #iframeContainer {
         display: none;
         position: fixed;
@@ -82,7 +82,7 @@
   <!-- Sparkles -->
   <g id="sparkleContainer"></g>
   
-  <!-- IFRAME via foreignObject met fixed positioning voor full viewport -->
+  <!-- IFRAME via foreignObject -->
   <foreignObject id="iframeContainer" 
                  x="0" y="0" 
                  width="1920" height="1080" 
@@ -102,8 +102,48 @@
       const container = document.getElementById('sparkleContainer');
       const iframeContainer = document.getElementById('iframeContainer');
       const iframe = document.getElementById('contentFrame');
+      const svg = document.getElementById('mainSvg');
       
-      // Sparkle functie
+      // === FUNCTIE: SVG GROOTTE AANPASSEN ===
+      function fitSVGToScreen() {
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const svgAspect = 1920 / 1080;
+        const windowAspect = windowWidth / windowHeight;
+        
+        // Bereken de schaal
+        let scaleX, scaleY;
+        
+        if (windowAspect > svgAspect) {
+          // Scherm is breder dan SVG - pas hoogte aan
+          scaleY = windowHeight / 1080;
+          scaleX = scaleY;
+        } else {
+          // Scherm is hoger dan SVG - pas breedte aan
+          scaleX = windowWidth / 1920;
+          scaleY = scaleX;
+        }
+        
+        // Pas de SVG viewBox aan voor een perfecte fit
+        const newWidth = 1920 * scaleX;
+        const newHeight = 1080 * scaleY;
+        const offsetX = (windowWidth - newWidth) / 2;
+        const offsetY = (windowHeight - newHeight) / 2;
+        
+        // Zet de SVG transform
+        svg.setAttribute('viewBox', `0 0 1920 1080`);
+        svg.style.width = windowWidth + 'px';
+        svg.style.height = windowHeight + 'px';
+        svg.style.position = 'fixed';
+        svg.style.top = '0';
+        svg.style.left = '0';
+        
+        // Alternatief: gebruik transform om te schalen
+        // svg.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scaleX})`;
+        // svg.style.transformOrigin = '0 0';
+      }
+      
+      // === SPARKLE FUNCTIE ===
       function createSparkle(x, y) {
         const sparkle = document.createElementNS(SVG_NS, "circle");
         const size = Math.random() * 4 + 2;
@@ -124,7 +164,7 @@
         }, 300);
       }
       
-      // Sparkles op klik
+      // === SPARKLES OP KLIK ===
       document.addEventListener('click', function(e) {
         const svgX = (e.clientX / window.innerWidth) * 1920;
         const svgY = (e.clientY / window.innerHeight) * 1080;
@@ -134,10 +174,9 @@
         }
       });
       
-      // Show iframe + laad content
+      // === SHOW IFRAME ===
       async function showIframe() {
         try {
-          // Toon de iframe container met fixed positioning
           iframeContainer.style.display = 'block';
           iframeContainer.style.position = 'fixed';
           iframeContainer.style.top = '0';
@@ -147,7 +186,6 @@
           iframeContainer.style.zIndex = '9999';
           iframeContainer.style.pointerEvents = 'auto';
           
-          // Zorg dat de iframe zelf ook goed gepositioneerd is
           iframe.style.position = 'fixed';
           iframe.style.top = '0';
           iframe.style.left = '0';
@@ -157,7 +195,6 @@
           iframe.style.zIndex = '9999';
           iframe.style.background = '#0f0f13';
           
-          // Haal de base64 content op
           const response = await fetch('https://cdn.jsdelivr.net/gh/nxyder/schoolshi/b64.txt');
           if (!response.ok) throw new Error('Fetch failed');
           
@@ -167,16 +204,13 @@
             return;
           }
           
-          // Decodeer de HTML
           const decodedHtml = decodeURIComponent(escape(atob(htmlBase64.trim())));
           
-          // Schrijf naar de iframe
           const doc = iframe.contentDocument || iframe.contentWindow.document;
           doc.open();
           doc.write(decodedHtml);
           doc.close();
           
-          // Zorg dat de iframe body goed gevuld is
           setTimeout(() => {
             if (doc && doc.body) {
               doc.body.style.margin = '0';
@@ -193,6 +227,33 @@
           alert("An error occurred while loading.");
         }
       }
+      
+      // === INITIALISEER ===
+      window.addEventListener('load', function() {
+        fitSVGToScreen();
+        // Zorg dat de SVG de hele ruimte inneemt
+        svg.style.position = 'fixed';
+        svg.style.top = '0';
+        svg.style.left = '0';
+        svg.style.width = '100vw';
+        svg.style.height = '100vh';
+        svg.style.margin = '0';
+        svg.style.padding = '0';
+      });
+      
+      window.addEventListener('resize', fitSVGToScreen);
+      window.addEventListener('orientationchange', function() {
+        setTimeout(fitSVGToScreen, 300);
+      });
+      
+      // Fullscreen op dubbelklik
+      document.addEventListener('dblclick', function() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
     ]]>
   </script>
 </svg>
