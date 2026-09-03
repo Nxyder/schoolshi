@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <!-- Importeer het Lobster font via Google Fonts -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Lobster&amp;display=swap');
+      .text {
+        font-family: 'Lobster', cursive;
+        font-size: 120px;
+        font-weight: 400;
+      }
+    </style>
+
+    <!-- Definieer de gradient voor de tekst -->
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4a7bc9" />
+      <stop offset="55%" stop-color="#9db8e8" />
+      <stop offset="100%" stop-color="#ffffff" />
+    </linearGradient>
+
+    <!-- Definieer de schaduw -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.9" />
+    </filter>
+  </defs>
+
+  <!-- Zwarte achtergrond -->
+  <rect width="1920" height="1080" fill="#000000" />
+
+  <!-- De tekst (iets boven het midden geplaatst zoals in de afbeelding) -->
+  <text x="960" y="500" text-anchor="middle" class="text" fill="url(#blueGradient)" filter="url(#shadow)">
+    Anonymous
+  </text>
+
+  <!-- Dunne witte lijn onderaan -->
+  <line x1="0" y1="1078" x2="1920" y2="1078" stroke="#e6e6e6" stroke-width="2" />
+</svg>
