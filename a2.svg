@@ -1,0 +1,304 @@
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="100%" height="100%" 
+     style="position: fixed; top: 0; left: 0; background:#0a0a0f;">
+  
+  <defs>
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      body { 
+        margin:0; 
+        padding:0; 
+        background:#0a0a0f; 
+        width:100vw; 
+        height:100vh; 
+        overflow:hidden;
+        font-family: 'Inter', -apple-system, sans-serif;
+        color:#fff;
+      }
+      .loading {
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        height:100vh;
+        font-size:18px;
+        color:#8888aa;
+        animation:pulse 1.5s infinite;
+      }
+      @keyframes pulse {
+        0%,100% { opacity:0.4; }
+        50% { opacity:1; }
+      }
+      .spinner {
+        width:40px;
+        height:40px;
+        border:3px solid #1a1a2e;
+        border-top-color:#6366f1;
+        border-radius:50%;
+        animation:spin 0.8s linear infinite;
+        margin-right:16px;
+      }
+      @keyframes spin {
+        to { transform:rotate(360deg); }
+      }
+    </style>
+  </defs>
+
+  <foreignObject x="0" y="0" width="100%" height="100%">
+    <body xmlns="http://www.w3.org/1999/xhtml">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      
+      <!-- Iframe voor de game -->
+      <iframe id="gameFrame" 
+              style="position:fixed; top:0; left:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999; display:none;">
+      </iframe>
+
+      <script type="text/javascript">
+        <![CDATA[
+          // === BASE64 GECODEERDE GAME HTML ===
+          // Dit is de HTML die in de iframe wordt geladen
+          function getGameHTML(alias) {
+            return btoa(`
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>${alias}</title>
+                <script src="https://cdn.jsdelivr.net/gh/UseNex/nex-js@f60df53fb5554e4e160c086b47bf71f6a213e42c/nex.min.js"><\/script>
+                <style>
+                  * { margin:0; padding:0; box-sizing:border-box; }
+                  body { background:#0a0a0f; width:100vw; height:100vh; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+                  nex-game { display:block; width:100vw; height:100vh; }
+                  .back-btn {
+                    position:fixed;
+                    top:20px;
+                    left:20px;
+                    z-index:10000;
+                    font-family:'Inter',sans-serif;
+                    font-size:14px;
+                    color:#fff;
+                    background:rgba(255,255,255,0.1);
+                    border:1px solid rgba(255,255,255,0.2);
+                    border-radius:8px;
+                    padding:10px 20px;
+                    cursor:pointer;
+                    transition:all 0.3s ease;
+                    backdrop-filter:blur(10px);
+                  }
+                  .back-btn:hover {
+                    background:rgba(255,255,255,0.2);
+                    border-color:rgba(255,255,255,0.4);
+                  }
+                </style>
+              </head>
+              <body>
+                <button class="back-btn" onclick="parent.closeGame()">← Back to games</button>
+                <nex-game id="game" alias="${alias}" gid="game-${Date.now()}"></nex-game>
+                <script>
+                  const gid = document.getElementById('game').getAttribute('gid');
+                  const checkReady = setInterval(() => {
+                    if (window.nex && window.nex[gid]) {
+                      clearInterval(checkReady);
+                      window.nex[gid].on('ready', () => {
+                        if (window.nex[gid]) window.nex[gid].start();
+                      });
+                      window.nex[gid].on('error', (err) => {
+                        console.error('Game error:', err);
+                        document.body.innerHTML = '<div style="color:#ef4444;text-align:center;padding:40px;">Failed to load game<br><button onclick="location.reload()" style="margin-top:20px;padding:10px 30px;background:#1a1a2e;color:#fff;border:1px solid #333;border-radius:8px;cursor:pointer;">Retry</button></div>';
+                      });
+                    }
+                  }, 200);
+                  setTimeout(() => clearInterval(checkReady), 10000);
+                <\/script>
+              </body>
+              </html>
+            `);
+          }
+
+          // === LAAD ALLE GAMES ===
+          function loadGames() {
+            const container = document.getElementById('gameGrid');
+            
+            // Check of Nex beschikbaar is
+            if (!window.nex || !window.nex.metadata) {
+              setTimeout(loadGames, 500);
+              return;
+            }
+
+            try {
+              const games = window.nex.metadata.getAllMetadata();
+              const gameList = Object.values(games);
+
+              if (gameList.length === 0) throw new Error('No games found');
+
+              container.innerHTML = '';
+              container.style.display = 'grid';
+
+              gameList.forEach(game => {
+                const card = document.createElement('div');
+                card.style.cssText = `
+                  background: #1a1a2e;
+                  border-radius: 12px;
+                  padding: 16px;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  text-align: center;
+                  min-height: 180px;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                `;
+                card.onmouseover = function() { 
+                  this.style.transform = 'translateY(-4px)'; 
+                  this.style.background = '#252545'; 
+                };
+                card.onmouseout = function() { 
+                  this.style.transform = 'translateY(0)'; 
+                  this.style.background = '#1a1a2e'; 
+                };
+                card.onclick = function() { 
+                  loadGame(game.alias); 
+                };
+
+                // Thumbnail
+                const img = document.createElement('img');
+                img.src = game.img || '';
+                img.alt = game.name;
+                img.style.cssText = `
+                  width: 100%;
+                  aspect-ratio: 4/3;
+                  object-fit: cover;
+                  border-radius: 8px;
+                  margin-bottom: 10px;
+                  background: #0a0a0f;
+                `;
+                img.onerror = function() {
+                  this.style.display = 'none';
+                  const fallback = document.createElement('div');
+                  fallback.style.cssText = `
+                    width: 100%;
+                    aspect-ratio: 4/3;
+                    background: #0a0a0f;
+                    border-radius: 8px;
+                    margin-bottom: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 32px;
+                    color: #444466;
+                  `;
+                  fallback.textContent = '🎮';
+                  card.insertBefore(fallback, card.firstChild);
+                };
+                card.appendChild(img);
+
+                // Game naam
+                const name = document.createElement('div');
+                name.style.cssText = `
+                  color: #ffffff;
+                  font-family: 'Inter', sans-serif;
+                  font-size: 14px;
+                  font-weight: 600;
+                  margin-bottom: 4px;
+                `;
+                name.textContent = game.name;
+                card.appendChild(name);
+
+                // Game categorie
+                const category = document.createElement('div');
+                category.style.cssText = `
+                  color: #8888aa;
+                  font-family: 'Inter', sans-serif;
+                  font-size: 10px;
+                  font-weight: 300;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                `;
+                category.textContent = game.category || 'Game';
+                card.appendChild(category);
+
+                container.appendChild(card);
+              });
+
+              document.getElementById('loading').style.display = 'none';
+              document.getElementById('header').style.display = 'block';
+              console.log(`✅ ${gameList.length} games geladen!`);
+
+            } catch (err) {
+              console.error('Error:', err);
+              document.getElementById('loading').innerHTML = `
+                <div style="color:#ef4444;text-align:center;">
+                  Failed to load games
+                  <br><br>
+                  <button onclick="loadGames()" style="padding:10px 30px;background:#1a1a2e;color:#fff;border:1px solid #333;border-radius:8px;cursor:pointer;">Retry</button>
+                </div>
+              `;
+            }
+          }
+
+          // === LAAD GAME IN IFRAME ===
+          function loadGame(alias) {
+            const frame = document.getElementById('gameFrame');
+            if (!frame) return;
+
+            // Zet de base64-gecodeerde HTML in de iframe
+            frame.srcdoc = atob(getGameHTML(alias));
+            frame.style.display = 'block';
+          }
+
+          // === SLUIT GAME ===
+          function closeGame() {
+            const frame = document.getElementById('gameFrame');
+            if (frame) {
+              frame.style.display = 'none';
+              frame.srcdoc = '';
+            }
+          }
+
+          // === INITIALISEER ===
+          function init() {
+            if (window.nex && window.nex.metadata) {
+              loadGames();
+            } else {
+              setTimeout(init, 500);
+            }
+          }
+
+          // Wacht tot DOM klaar is
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+          } else {
+            init();
+          }
+
+          // Fallback
+          setTimeout(() => {
+            if (!window.nex || !window.nex.metadata) {
+              console.warn('⚠️ Nex niet geladen, probeer opnieuw...');
+              loadGames();
+            }
+          }, 3000);
+        ]]>
+      </script>
+
+      <!-- HEADER -->
+      <div id="header" style="display:none; text-align:center; padding:30px 20px 10px;">
+        <h1 style="font-size:36px; font-weight:700; color:#fff; font-family:'Inter',sans-serif; letter-spacing:-1px; margin:0;">Nex Games</h1>
+        <p style="color:#8888aa; font-size:14px; letter-spacing:4px; text-transform:uppercase; margin:8px 0 0 0; font-family:'Inter',sans-serif;">Click any game to play</p>
+      </div>
+
+      <!-- LOADING -->
+      <div id="loading" style="display:flex; align-items:center; justify-content:center; height:100vh; font-family:'Inter',sans-serif; color:#8888aa;">
+        <div class="spinner"></div>
+        <span>Loading games...</span>
+      </div>
+
+      <!-- GAME GRID -->
+      <div id="gameGrid" style="display:none; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:20px; max-width:1400px; margin:0 auto; padding:20px 20px 40px;">
+      </div>
+
+    </body>
+  </foreignObject>
+
+</svg>
