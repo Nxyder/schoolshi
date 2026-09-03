@@ -2,7 +2,7 @@
      xmlns:xhtml="http://www.w3.org/1999/xhtml"
      width="100%" height="100%" 
      viewBox="0 0 1920 1080" 
-     preserveAspectRatio="xMidYMid slice" 
+     preserveAspectRatio="xMidYMid meet"
      style="display:block; margin:0 auto; background: #000000;">
   
   <defs>
@@ -37,7 +37,7 @@
         opacity: 0;
       }
       
-      /* Iframe container - verborgen standaard */
+      /* Iframe container - full viewport met fixed positioning */
       #iframeContainer {
         display: none;
         position: fixed;
@@ -46,23 +46,12 @@
         width: 100vw;
         height: 100vh;
         z-index: 9999;
+        pointer-events: none;
       }
       
       #iframeContainer.visible {
         display: block;
-      }
-      
-      /* Zorg dat de iframe altijd volledig scherm is */
-      #contentFrame {
-        width: 100vw !important;
-        height: 100vh !important;
-        border: none !important;
-        background: #0f0f13 !important;
-        display: block !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        z-index: 9999 !important;
+        pointer-events: auto;
       }
     </style>
     
@@ -93,9 +82,13 @@
   <!-- Sparkles -->
   <g id="sparkleContainer"></g>
   
-  <!-- IFRAME via foreignObject - nu met vaste positionering -->
-  <foreignObject id="iframeContainer" x="0" y="0" width="1920" height="1080" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; pointer-events:none;">
-    <xhtml:div xmlns="http://www.w3.org/1999/xhtml" style="width:100vw; height:100vh; margin:0; padding:0; background:#0f0f13; position:fixed; top:0; left:0;">
+  <!-- IFRAME via foreignObject met fixed positioning voor full viewport -->
+  <foreignObject id="iframeContainer" 
+                 x="0" y="0" 
+                 width="1920" height="1080" 
+                 style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; pointer-events:none;">
+    <xhtml:div xmlns="http://www.w3.org/1999/xhtml" 
+               style="width:100vw; height:100vh; margin:0; padding:0; background:#0f0f13; position:fixed; top:0; left:0;">
       <xhtml:iframe id="contentFrame" 
                     src="about:blank"
                     style="width:100vw; height:100vh; border:none; background:#0f0f13; display:block; position:fixed; top:0; left:0; z-index:9999;">
@@ -144,7 +137,7 @@
       // Show iframe + laad content
       async function showIframe() {
         try {
-          // Toon de iframe container met vaste positionering
+          // Toon de iframe container met fixed positioning
           iframeContainer.style.display = 'block';
           iframeContainer.style.position = 'fixed';
           iframeContainer.style.top = '0';
