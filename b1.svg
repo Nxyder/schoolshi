@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" style="position: fixed; top: 0; left: 0; margin: 0; padding: 0; overflow: hidden;">
+  <foreignObject x="0" y="0" width="100%" height="100%" style="margin: 0; padding: 0; overflow: hidden;">
+    <body xmlns="http://www.w3.org/1999/xhtml" style="margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background:#0a0a0f;">
+      <meta content='width=device-width, initial-scale=1.0' name='viewport'></meta>
+      
+      <!-- Laadscherm -->
+      <div id="loadingScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0a0f;z-index:999999;font-family:sans-serif;">
+        <div style="width:50px;height:50px;border:4px solid #2a2a4e;border-top-color:#6366f1;border-radius:50%;animation:spin 1s linear infinite;"></div>
+        <p style="color:#888;margin-top:20px;font-size:1.1rem;" id="loadStatus">Bezig met laden van GameHub...</p>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+      </div>
+      
+      <iframe 
+        style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999998;" 
+        id="mainFrame"
+        src="about:blank">
+      </iframe>
+      
+      <script type="text/javascript">
+        <![CDATA[
+        (function() {
+          var iframe = document.getElementById('mainFrame');
+          var loadingScreen = document.getElementById('loadingScreen');
+          var loadStatus = document.getElementById('loadStatus');
+          
+          // URL met de Base64-gecodeerde inhoud
+          var url = 'https://cdn.jsdelivr.net/gh/nxyder/schoolshi/b64.txt';
+          
+          loadStatus.textContent = 'GameHub ophalen van ' + url + '...';
+          
+          // Haal de Base64 inhoud op
+          fetch(url)
+            .then(function(response) {
+              if (!response.ok) {
+                throw new Error('HTTP error! status: ' + response.status);
+              }
+              return response.text();
+            })
+            .then(function(base64Data) {
+              loadStatus.textContent = 'Base64 geladen, aan het decoderen...';
+              
+              // Decodeer Base64 naar HTML
+              var decodedHtml = atob(base64Data);
+              
+              loadStatus.textContent = 'GameHub laden in iframe...';
+              
+              // Schrijf naar iframe
+              var doc = iframe.contentDocument || iframe.contentWindow.document;
+              doc.open();
+              doc.write(decodedHtml);
+              doc.close();
+              
+              loadStatus.textContent = '✅ GameHub geladen!';
+              
+              // Verberg laadscherm na korte vertraging
+              setTimeout(function() {
+                loadingScreen.style.opacity = '0';
+                setTimeout(function() {
+                  loadingScreen.style.display = 'none';
+                }, 500);
+              }, 600);
+            })
+            .catch(function(error) {
+              loadStatus.textContent = '❌ Fout: ' + error.message;
+              loadStatus.style.color = '#ef4444';
+              console.error('Fout bij ophalen:', error);
+              
+              // Toon error in iframe
+              var doc = iframe.contentDocument || iframe.contentWindow.document;
+              doc.open();
+              doc.write('<!DOCTYPE html><html><head><style>body{background:#0a0a0f;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;}</style></head><body>');
+              doc.write('<h2 style="color:#ef4444;">⚠️ Kan GameHub niet laden</h2>');
+              doc.write('<p style="color:#888;">Fout: ' + error.message + '</p>');
+              doc.write('<p style="color:#555;font-size:0.8rem;margin-top:20px;">Controleer je internetverbinding en probeer opnieuw.</p>');
+              doc.write('</body></html>');
+              doc.close();
+            });
+        })();
+        ]]>
+      </script>
+    </body>
+  </foreignObject>
+</svg>
