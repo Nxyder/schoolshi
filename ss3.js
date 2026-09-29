@@ -565,44 +565,41 @@
 
     // ----- TODO ACTIONS -----
 
+       // ----- TODO ACTIONS -----
+
     /** Optimistische toggle: past state aan, dan API. */
-    /* ============================================================
- * FIX voor toggleTodo bug in ss1.js
- * De library keert `done` om: done=true → unresolve (fout)
- * Deze versie doet het correct: done=true → resolve
- * ============================================================ */
-ss.planner.toggleTodo = async function(id, type, done) {
-  const todo = this._todos.find(t => t.i === id);
-  const prevSt = todo ? todo.st : "";
+    async toggleTodo(id, type, done) {
+      const todo = this._todos.find(t => t.i === id);
+      const prevSt = todo ? todo.st : '';
 
-  // Optimistic update — JUIST: done=true → "resolved", done=false → ""
-  if (todo) todo.st = done ? "resolved" : "";
-  this.emitter.emit("planner:todos-changed", this._todos);
+      // Optimistic update — done=true → "resolved", done=false → ""
+      if (todo) todo.st = done ? 'resolved' : '';
+      this.emitter.emit('planner:todos-changed', this._todos);
 
-  // JUISTE actie: done=true → resolve, done=false → unresolve
-  const action = done ? "resolve" : "unresolve";
-  const platform = this._platformId();
+      // JUISTE actie: done=true → resolve, done=false → unresolve
+      const action = done ? 'resolve' : 'unresolve';
+      const platform = this._platformId();
 
-  if (!platform) {
-    if (todo) todo.st = prevSt;
-    this.emitter.emit("planner:todos-changed", this._todos);
-    throw new Error("Platform ID niet gevonden");
-  }
+      if (!platform) {
+        if (todo) todo.st = prevSt;
+        this.emitter.emit('planner:todos-changed', this._todos);
+        throw new Error('Platform ID niet gevonden');
+      }
 
-  try {
-    await this.client.request(
-      `/api/planner/${platform}/${id}/${action}?type=${type}`,
-      { method: "POST" }
-    );
-    this.emitter.emit("planner:todo-toggled", { id, type, action });
-    return true;
-  } catch (err) {
-    // Rollback bij fout
-    if (todo) todo.st = prevSt;
-    this.emitter.emit("planner:todos-changed", this._todos);
-    throw err;
-  }
-};
+      try {
+        await this.client.request(
+          `/api/planner/${platform}/${id}/${action}?type=${type}`,
+          { method: 'POST' }
+        );
+        this.emitter.emit('planner:todo-toggled', { id, type, action });
+        return true;
+      } catch (err) {
+        // Rollback bij fout
+        if (todo) todo.st = prevSt;
+        this.emitter.emit('planner:todos-changed', this._todos);
+        throw err;
+      }
+    }
 
     async deleteTodo(id, type) {
       const platform = this._platformId();
